@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import BrandHeader from '../components/BrandHeader';
 import colors from '../theme/colors';
 
@@ -13,6 +14,13 @@ export default function SplashScreen() {
         <ActivityIndicator color={colors.magenta} />
         <Text style={styles.hint}>AfriPay Pro — espace marchand</Text>
       </View>
+      <LinearGradient
+        colors={[`${colors.orange}00`, `${colors.orange}33`]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.glow}
+        pointerEvents="none"
+      />
     </View>
   );
 }
@@ -38,5 +46,12 @@ const styles = StyleSheet.create({
   hint: {
     color: colors.textMuted,
     fontSize: 12,
+  },
+  glow: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 160,
   },
 });

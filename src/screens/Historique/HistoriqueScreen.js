@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Card from '../../components/Card';
+import TxTypeIcon from '../../components/TxTypeIcon';
 import { TransactionStatusBadge } from '../../components/StatusBadge';
 import { getMyHistory, getMyStats, getMyWallet } from '../../api/wallet';
 import { formatFcfa, formatDateTime } from '../../utils/format';
@@ -133,7 +134,8 @@ export default function HistoriqueScreen({ navigation }) {
           <TouchableOpacity onPress={() => navigation.navigate('TransactionDetail', { transaction: item, walletId })}>
             <Card style={styles.txCard}>
               <View style={styles.txRow}>
-                <View style={styles.txLeft}>
+                <TxTypeIcon type={item.type} />
+                <View style={[styles.txLeft, { marginLeft: 12 }]}>
                   <Text style={styles.txLibelle} numberOfLines={1}>
                     {item.libelle || item.type}
                   </Text>

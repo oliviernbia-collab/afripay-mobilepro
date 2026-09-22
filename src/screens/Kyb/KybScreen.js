@@ -71,8 +71,8 @@ export default function KybScreen({ navigation }) {
         <KybBadge statut={merchant?.statut_kyb} style={{ marginTop: 8 }} />
         {merchant?.statut_kyb !== 'validé' ? (
           <Text style={styles.statusHint}>
-            Envoyez les documents requis ci-dessous. Un agent AfriPay validera votre dossier depuis le
-            back-office ; l'encaissement sera débloqué automatiquement à la validation.
+            Dossier en cours de validation — Notre équipe vérifie les informations. Vous serez notifié dès la
+            validation. Envoyez les documents requis ci-dessous.
           </Text>
         ) : (
           <Text style={styles.statusHintOk}>Votre compte est validé, vous pouvez encaisser des paiements.</Text>

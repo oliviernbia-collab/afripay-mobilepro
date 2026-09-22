@@ -65,7 +65,7 @@ main), gestion du portefeuille, transferts, historique et onboarding KYB.
 ## Notes techniques
 
 - Navigation avec `@react-navigation/native` + native-stack + bottom-tabs (pas d'Expo Router).
-- Logo officiel (`assets/Logo-AfriPay.png` à la racine du repo) redimensionné en plusieurs tailles
+- Logo officiel (`assets/logo.png` à la racine du repo) redimensionné en plusieurs tailles
   dans `assets/brand/` et utilisé via `Image` dans `src/components/BrandHeader.js` (splash, connexion,
   en-tête du tableau de bord), ainsi que pour régénérer l'icône de l'app et le favicon.
 - Jetons stockés avec `expo-secure-store` ; rafraîchissement automatique via `POST /auth/refresh`

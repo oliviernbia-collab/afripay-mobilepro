@@ -9,12 +9,24 @@ const KYB_LABELS = {
   'suspendu': { label: 'Suspendu', color: colors.error },
 };
 
-export function KybBadge({ statut, style }) {
+// `dark`: solid dark chip instead of a color-tinted one — needed when the badge sits on a
+// bright/gradient background (e.g. the balance card), where a gold badge for "en_attente" on
+// an orange/gold gradient becomes unreadable (gold-on-gold). Text/dot keep their status color
+// for meaning, only the chip background changes so it reads on any backdrop.
+export function KybBadge({ statut, dark, style }) {
   const info = KYB_LABELS[statut] || { label: statut || 'Inconnu', color: colors.textMuted };
   return (
-    <View style={[styles.badge, { backgroundColor: `${info.color}22`, borderColor: info.color }, style]}>
+    <View
+      style={[
+        styles.badge,
+        dark
+          ? { backgroundColor: 'rgba(0,0,0,0.4)', borderColor: 'rgba(0,0,0,0.15)' }
+          : { backgroundColor: `${info.color}22`, borderColor: info.color },
+        style,
+      ]}
+    >
       <View style={[styles.dot, { backgroundColor: info.color }]} />
-      <Text style={[styles.text, { color: info.color }]}>{info.label}</Text>
+      <Text style={[styles.text, { color: dark ? colors.text : info.color }]}>{info.label}</Text>
     </View>
   );
 }

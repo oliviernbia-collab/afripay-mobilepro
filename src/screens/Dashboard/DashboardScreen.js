@@ -4,13 +4,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import Icon from '../../components/Icon';
 import { LinearGradient } from 'expo-linear-gradient';
 import colors, { gradients, radii } from '../../theme/colors';
-import BrandHeader from '../../components/BrandHeader';
 import Card from '../../components/Card';
 import { KybBadge, TransactionStatusBadge } from '../../components/StatusBadge';
 import { useAuth } from '../../context/AuthContext';
-import { getMyWallet, getMyHistory } from '../../api/wallet';
+import { getMyWallet, getMyHistory, getMyStats } from '../../api/wallet';
 import { formatFcfa, formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
+import TxTypeIcon from '../../components/TxTypeIcon';
+
+const todayStr = () => new Date().toISOString().slice(0, 10);
 
 const ACTIONS = [
   { key: 'encaisser', label: 'Encaisser', icon: 'qrcode', color: colors.magenta, route: 'EncaisserAmount' },
@@ -22,16 +24,28 @@ export default function DashboardScreen({ navigation }) {
   const { merchant, isKybValidated, refreshMerchant } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [todayEncaisse, setTodayEncaisse] = useState(0);
+  const [todayTransfere, setTodayTransfere] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+  const [balanceHidden, setBalanceHidden] = useState(false);
 
   const loadData = useCallback(async () => {
     setError('');
     try {
-      const [w, h] = await Promise.all([getMyWallet(), getMyHistory({ limit: 5 }), refreshMerchant()]);
+      const today = todayStr();
+      const [w, h, stats, transfersToday] = await Promise.all([
+        getMyWallet(),
+        getMyHistory({ limit: 5 }),
+        getMyStats('jour'),
+        getMyHistory({ type: 'transfert', dateDebut: today, dateFin: today, limit: 200 }),
+        refreshMerchant(),
+      ]);
       setWallet(w);
       setTransactions(h);
+      setTodayEncaisse(stats.reduce((sum, s) => sum + Number(s.total || 0), 0));
+      setTodayTransfere(transfersToday.reduce((sum, t) => sum + Number(t.montant || 0), 0));
     } catch (e) {
       setError(extractErrorMessage(e, 'Impossible de charger votre tableau de bord.'));
     }
@@ -57,15 +71,19 @@ export default function DashboardScreen({ navigation }) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.magenta} />}
     >
       <View style={styles.header}>
-        <BrandHeader size="compact" />
+        <View style={styles.avatar}>
+          <Icon name="store" size={20} color={colors.text} />
+        </View>
+        <View style={styles.greetingTextWrap}>
+          <Text style={styles.greeting} numberOfLines={1}>
+            Bonjour{merchant?.raison_sociale ? `, ${merchant.raison_sociale}` : ''}
+          </Text>
+          <Text style={styles.greetingSub}>Marchand</Text>
+        </View>
         <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.bellBtn}>
-          <Icon name="bell" size={22} color={colors.text} />
+          <Icon name="bell" size={18} color={colors.turquoise} />
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.greeting}>
-        Bonjour{merchant?.raison_sociale ? `, ${merchant.raison_sociale}` : ''} 👋
-      </Text>
 
       {!isKybValidated ? (
         <TouchableOpacity onPress={() => navigation.navigate('Kyb')} activeOpacity={0.85}>
@@ -80,16 +98,38 @@ export default function DashboardScreen({ navigation }) {
         </TouchableOpacity>
       ) : null}
 
-      <LinearGradient colors={gradients.brandShort} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.balanceCard}>
+      <LinearGradient colors={gradients.balance} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.balanceCard}>
         <View style={styles.balanceHeader}>
-          <Text style={styles.balanceLabel}>Solde disponible</Text>
-          <KybBadge statut={merchant?.statut_kyb} />
+          <View style={styles.balanceLabelRow}>
+            <View style={styles.balanceIconWrap}>
+              <Icon name="wallet" size={13} color={colors.text} />
+            </View>
+            <Text style={styles.balanceLabel}>Solde disponible</Text>
+            <TouchableOpacity onPress={() => setBalanceHidden((v) => !v)} hitSlop={10}>
+              <Icon name={balanceHidden ? 'eye-slash' : 'eye'} size={15} color="rgba(255,255,255,0.75)" />
+            </TouchableOpacity>
+          </View>
+          <KybBadge statut={merchant?.statut_kyb} dark />
         </View>
         <Text style={styles.balanceAmount}>
-          {loading ? '···' : formatFcfa(wallet?.solde)}
+          {loading ? '···' : balanceHidden ? '•••••• FCFA' : formatFcfa(wallet?.solde)}
         </Text>
         <Text style={styles.balanceSub}>Portefeuille AfriPay Marchand</Text>
       </LinearGradient>
+
+      <View style={styles.todayRow}>
+        <Text style={styles.todayTitle}>Aujourd&apos;hui</Text>
+        <View style={styles.todayStatsRow}>
+          <View style={styles.todayStat}>
+            <Text style={styles.todayStatLabel}>Encaissements</Text>
+            <Text style={styles.todayStatValue}>{formatFcfa(todayEncaisse)}</Text>
+          </View>
+          <View style={styles.todayStat}>
+            <Text style={styles.todayStatLabel}>Transferts</Text>
+            <Text style={styles.todayStatValue}>{formatFcfa(todayTransfere)}</Text>
+          </View>
+        </View>
+      </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -124,7 +164,8 @@ export default function DashboardScreen({ navigation }) {
         transactions.map((tx) => (
           <Card key={tx.id} style={styles.txCard}>
             <View style={styles.txRow}>
-              <View style={styles.txLeft}>
+              <TxTypeIcon type={tx.type} />
+              <View style={[styles.txLeft, { marginLeft: 12 }]}>
                 <Text style={styles.txLibelle} numberOfLines={1}>
                   {tx.libelle || tx.type}
                 </Text>
@@ -162,17 +203,36 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   bellBtn: {
-    padding: 6,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: `${colors.turquoise}22`,
+    borderWidth: 1,
+    borderColor: colors.turquoise,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: radii.lg,
+    backgroundColor: colors.violet,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  greetingTextWrap: { flex: 1, marginHorizontal: 12 },
   greeting: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
-    marginTop: 16,
-    marginBottom: 16,
+  },
+  greetingSub: {
+    color: colors.textMuted,
+    fontSize: 12,
+    marginTop: 2,
   },
   kybBanner: {
     flexDirection: 'row',
@@ -201,19 +261,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  balanceLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 1,
+  },
+  balanceIconWrap: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   balanceLabel: {
-    color: '#00000099',
+    color: 'rgba(255,255,255,0.85)',
     fontWeight: '700',
     fontSize: 13,
   },
   balanceAmount: {
-    color: '#000',
+    color: colors.text,
     fontSize: 32,
     fontWeight: '800',
     marginTop: 10,
   },
   balanceSub: {
-    color: '#00000099',
+    color: 'rgba(255,255,255,0.75)',
     fontSize: 12,
     marginTop: 4,
     fontWeight: '600',
@@ -224,6 +298,19 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textAlign: 'center',
   },
+  todayRow: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    padding: 16,
+    marginBottom: 20,
+  },
+  todayTitle: { color: colors.textMuted, fontSize: 12, fontWeight: '700', marginBottom: 10 },
+  todayStatsRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  todayStat: { flex: 1 },
+  todayStatLabel: { color: colors.textSecondary, fontSize: 12 },
+  todayStatValue: { color: colors.text, fontSize: 17, fontWeight: '800', marginTop: 4 },
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

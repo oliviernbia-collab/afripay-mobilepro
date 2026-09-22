@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import Icon from './Icon';
 import colors, { radii } from '../theme/colors';
 
 export default function Input({
@@ -8,9 +9,22 @@ export default function Input({
   containerStyle,
   right,
   style,
+  secureTextEntry,
   ...textInputProps
 }) {
   const [focused, setFocused] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const isSecure = !!secureTextEntry;
+
+  const toggle = isSecure ? (
+    <Pressable
+      onPress={() => setRevealed((v) => !v)}
+      hitSlop={10}
+      accessibilityLabel={revealed ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+    >
+      <Icon name={revealed ? 'eye-slash' : 'eye'} size={16} color={colors.textMuted} />
+    </Pressable>
+  ) : null;
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -25,6 +39,7 @@ export default function Input({
         <TextInput
           placeholderTextColor={colors.textMuted}
           {...textInputProps}
+          secureTextEntry={isSecure && !revealed}
           style={[styles.input, style]}
           onFocus={(e) => {
             setFocused(true);
@@ -35,7 +50,7 @@ export default function Input({
             textInputProps.onBlur?.(e);
           }}
         />
-        {right}
+        {right || toggle}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>

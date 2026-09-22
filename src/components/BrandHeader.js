@@ -7,7 +7,7 @@ const LOGO_SPLASH = require('../../assets/brand/logo-splash.png');
 const LOGO_COMPACT = require('../../assets/brand/logo-compact.png');
 
 // size: 'splash' | 'main' | 'compact'
-// showTagline: show "Créer. Partager. Gagner." under the logo
+// showTagline: show "Payez. Envoyez. Progressez." under the logo
 export default function BrandHeader({ size = 'main', showTagline = false, style }) {
   const source = size === 'splash' ? LOGO_SPLASH : size === 'compact' ? LOGO_COMPACT : LOGO_MAIN;
   const imgStyle = size === 'splash' ? styles.imgSplash : size === 'compact' ? styles.imgCompact : styles.imgMain;
@@ -15,7 +15,7 @@ export default function BrandHeader({ size = 'main', showTagline = false, style 
   return (
     <View style={[styles.container, style]}>
       <Image source={source} style={imgStyle} resizeMode="contain" />
-      {showTagline ? <Text style={styles.tagline}>Créer. Partager. Gagner.</Text> : null}
+      {showTagline ? <Text style={styles.tagline}>Payez. Envoyez. Progressez.</Text> : null}
     </View>
   );
 }

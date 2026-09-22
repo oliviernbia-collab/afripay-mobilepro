@@ -12,10 +12,18 @@ import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
+import IconRow from '../../components/IconRow';
 import { transferInterne, transferExterne, MOBILE_MONEY_OPERATORS } from '../../api/transferts';
 import { extractErrorMessage } from '../../api/client';
 
 const PIN_THRESHOLD = 50000;
+
+const OPERATOR_META = {
+  wave: { color: '#1DC8E3', icon: 'droplet' },
+  orange_money: { color: colors.orange, icon: 'mobile-screen' },
+  moov_money: { color: colors.blue, icon: 'tower-cell' },
+  mtn_money: { color: colors.gold, icon: 'sim-card' },
+};
 
 export default function TransferScreen() {
   const [mode, setMode] = useState('externe'); // 'externe' | 'interne'
@@ -91,19 +99,21 @@ function ExternalTransferForm() {
   return (
     <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
       <Text style={styles.label}>Opérateur</Text>
-      <View style={styles.operatorRow}>
-        {MOBILE_MONEY_OPERATORS.map((op) => (
-          <TouchableOpacity
+      {MOBILE_MONEY_OPERATORS.map((op) => {
+        const meta = OPERATOR_META[op.value] || { color: colors.turquoise, icon: 'wallet' };
+        return (
+          <IconRow
             key={op.value}
-            style={[styles.operatorChip, operateur === op.value && styles.operatorChipActive]}
+            icon={meta.icon}
+            iconColor={meta.color}
+            label={op.label}
+            selected={operateur === op.value}
             onPress={() => setOperateur(op.value)}
-          >
-            <Text style={[styles.operatorChipText, operateur === op.value && styles.operatorChipTextActive]}>
-              {op.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+            showChevron={false}
+            right={operateur === op.value ? <Icon name="circle-check" size={18} color={meta.color} /> : null}
+          />
+        );
+      })}
 
       <Input label="Numéro destinataire" placeholder="Ex: 0700000000" keyboardType="phone-pad" value={numero} onChangeText={setNumero} />
       <Input label="Montant (FCFA)" placeholder="0" keyboardType="number-pad" value={montant} onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))} />
@@ -204,18 +214,6 @@ const styles = StyleSheet.create({
   tabTextActive: { color: colors.text },
   form: { padding: 20, paddingBottom: 60 },
   label: { color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '500' },
-  operatorRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
-  operatorChip: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-    borderRadius: radii.pill,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  operatorChipActive: { borderColor: colors.magenta, backgroundColor: `${colors.magenta}22` },
-  operatorChipText: { color: colors.textSecondary, fontSize: 12.5, fontWeight: '600' },
-  operatorChipTextActive: { color: colors.text },
   errorText: { color: colors.error, fontSize: 13, marginBottom: 12, textAlign: 'center' },
   successText: { color: colors.success, fontSize: 13, marginBottom: 12, textAlign: 'center', fontWeight: '600' },
 });

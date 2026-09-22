@@ -27,6 +27,7 @@ export const gradients = {
   brand: [colors.magenta, colors.orange, colors.gold, colors.green, colors.turquoise, colors.blue],
   brandShort: [colors.magenta, colors.orange, colors.gold],
   cta: [colors.magenta, colors.orange],
+  balance: [colors.turquoise, colors.blue],
 };
 
 export const radii = {

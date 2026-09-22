@@ -2,8 +2,9 @@ import React, { useCallback, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Icon from '../../components/Icon';
-import colors, { radii } from '../../theme/colors';
+import colors, { gradients } from '../../theme/colors';
 import GradientButton from '../../components/GradientButton';
 import { formatFcfa } from '../../utils/format';
 import { encaisser } from '../../api/marchand';
@@ -78,7 +79,22 @@ export default function ScanScreen({ route, navigation }) {
           barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
           onBarcodeScanned={scanning ? handleBarcodeScanned : undefined}
         />
-        <View style={styles.frame} />
+        <View style={styles.frame} pointerEvents="none">
+          <LinearGradient colors={gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.frameBarH} />
+          <LinearGradient
+            colors={gradients.brand}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.frameBarH, styles.frameBarBottom]}
+          />
+          <LinearGradient colors={gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.frameBarV} />
+          <LinearGradient
+            colors={gradients.brand}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={[styles.frameBarV, styles.frameBarRight]}
+          />
+        </View>
         {processing ? (
           <View style={styles.processingOverlay}>
             <ActivityIndicator size="large" color={colors.text} />
@@ -124,10 +140,11 @@ const styles = StyleSheet.create({
     left: '15%',
     right: '15%',
     bottom: '25%',
-    borderWidth: 3,
-    borderColor: colors.turquoise,
-    borderRadius: radii.lg,
   },
+  frameBarH: { position: 'absolute', top: 0, left: 0, right: 0, height: 4, borderRadius: 2 },
+  frameBarBottom: { top: undefined, bottom: 0 },
+  frameBarV: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 4, borderRadius: 2 },
+  frameBarRight: { left: undefined, right: 0 },
   processingOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#000000CC',
