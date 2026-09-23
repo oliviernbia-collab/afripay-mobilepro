@@ -1,30 +1,33 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 
-const OPTIONS = [
-  {
-    type: 'entreprise',
-    title: 'Entreprise',
-    description: 'Société, boutique ou commerce formel (raison sociale, RCCM, NCC/NIF).',
-    icon: 'building',
-    color: colors.blue,
-  },
-  {
-    type: 'particulier',
-    title: 'Particulier',
-    description: "Auto-entrepreneur, vendeur individuel ou activité informelle.",
-    icon: 'user',
-    color: colors.magenta,
-  },
-];
-
 export default function RegisterTypeScreen({ navigation }) {
+  const { t } = useTranslation();
+
+  const OPTIONS = [
+    {
+      type: 'entreprise',
+      title: t('auth.registerType.entrepriseTitle'),
+      description: t('auth.registerType.entrepriseDesc'),
+      icon: 'building',
+      color: colors.blue,
+    },
+    {
+      type: 'particulier',
+      title: t('auth.registerType.particulierTitle'),
+      description: t('auth.registerType.particulierDesc'),
+      icon: 'user',
+      color: colors.magenta,
+    },
+  ];
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quel type de compte marchand souhaitez-vous créer ?</Text>
-      <Text style={styles.subtitle}>Ce choix détermine les documents à fournir pour valider votre dossier.</Text>
+      <Text style={styles.title}>{t('auth.registerType.title')}</Text>
+      <Text style={styles.subtitle}>{t('auth.registerType.subtitle')}</Text>
 
       <View style={styles.options}>
         {OPTIONS.map((opt) => (

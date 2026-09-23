@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Input from '../../components/Input';
@@ -10,6 +11,7 @@ import { formatFcfa } from '../../utils/format';
 const QUICK_AMOUNTS = [500, 1000, 2000, 5000, 10000, 25000];
 
 export default function AmountScreen({ navigation }) {
+  const { t } = useTranslation();
   const { isKybValidated } = useAuth();
   const [montant, setMontant] = useState('');
   const [error, setError] = useState('');
@@ -17,7 +19,7 @@ export default function AmountScreen({ navigation }) {
   const handleContinue = () => {
     const value = Number(montant);
     if (!value || value <= 0) {
-      setError('Veuillez saisir un montant valide.');
+      setError(t('encaisser.amount.invalidAmount'));
       return;
     }
     navigation.navigate('EncaisserScan', { montant: value });
@@ -27,20 +29,21 @@ export default function AmountScreen({ navigation }) {
     return (
       <View style={styles.blockedContainer}>
         <Icon name="lock" size={48} color={colors.warning} />
-        <Text style={styles.blockedTitle}>Compte en attente de validation</Text>
-        <Text style={styles.blockedText}>
-          Vous pourrez encaisser dès que votre dossier sera validé. Complétez votre dossier KYB pour
-          accélérer la vérification.
-        </Text>
-        <GradientButton title="Compléter mon dossier KYB" onPress={() => navigation.navigate('Kyb')} style={{ marginTop: 24, width: '100%' }} />
+        <Text style={styles.blockedTitle}>{t('encaisser.amount.blockedTitle')}</Text>
+        <Text style={styles.blockedText}>{t('encaisser.amount.blockedText')}</Text>
+        <GradientButton
+          title={t('encaisser.amount.completeKyb')}
+          onPress={() => navigation.navigate('Kyb')}
+          style={{ marginTop: 24, width: '100%' }}
+        />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Montant à encaisser</Text>
-      <Text style={styles.subtitle}>Saisissez le montant que le client doit payer.</Text>
+      <Text style={styles.title}>{t('encaisser.amount.title')}</Text>
+      <Text style={styles.subtitle}>{t('encaisser.amount.subtitle')}</Text>
 
       <Input
         placeholder="0"
@@ -63,7 +66,7 @@ export default function AmountScreen({ navigation }) {
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <GradientButton
-        title="Scanner le paiement du client"
+        title={t('encaisser.amount.scanButton')}
         onPress={handleContinue}
         style={{ marginTop: 20 }}
         icon={<Icon name="qrcode" size={18} color={colors.text} />}

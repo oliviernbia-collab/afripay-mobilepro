@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import colors, { radii } from '../theme/colors';
 
-const KYB_LABELS = {
-  'validé': { label: 'Validé', color: colors.success },
-  'en_attente': { label: 'En attente', color: colors.warning },
-  'rejeté': { label: 'Rejeté', color: colors.error },
-  'suspendu': { label: 'Suspendu', color: colors.error },
+const KYB_COLORS = {
+  validé: colors.success,
+  en_attente: colors.warning,
+  rejeté: colors.error,
+  suspendu: colors.error,
 };
 
 // `dark`: solid dark chip instead of a color-tinted one — needed when the badge sits on a
@@ -14,34 +15,38 @@ const KYB_LABELS = {
 // an orange/gold gradient becomes unreadable (gold-on-gold). Text/dot keep their status color
 // for meaning, only the chip background changes so it reads on any backdrop.
 export function KybBadge({ statut, dark, style }) {
-  const info = KYB_LABELS[statut] || { label: statut || 'Inconnu', color: colors.textMuted };
+  const { t } = useTranslation();
+  const color = KYB_COLORS[statut] || colors.textMuted;
+  const label = t(`status.kyb.${statut}`, { defaultValue: t('status.kyb.unknown') });
   return (
     <View
       style={[
         styles.badge,
         dark
           ? { backgroundColor: 'rgba(0,0,0,0.4)', borderColor: 'rgba(0,0,0,0.15)' }
-          : { backgroundColor: `${info.color}22`, borderColor: info.color },
+          : { backgroundColor: `${color}22`, borderColor: color },
         style,
       ]}
     >
-      <View style={[styles.dot, { backgroundColor: info.color }]} />
-      <Text style={[styles.text, { color: dark ? colors.text : info.color }]}>{info.label}</Text>
+      <View style={[styles.dot, { backgroundColor: color }]} />
+      <Text style={[styles.text, { color: dark ? colors.text : color }]}>{label}</Text>
     </View>
   );
 }
 
-const TX_STATUS_LABELS = {
-  'réussi': { label: 'Réussi', color: colors.success },
-  'échoué': { label: 'Échoué', color: colors.error },
-  'en_attente': { label: 'En attente', color: colors.warning },
+const TX_STATUS_COLORS = {
+  réussi: colors.success,
+  échoué: colors.error,
+  en_attente: colors.warning,
 };
 
 export function TransactionStatusBadge({ statut, style }) {
-  const info = TX_STATUS_LABELS[statut] || { label: statut, color: colors.textMuted };
+  const { t } = useTranslation();
+  const color = TX_STATUS_COLORS[statut] || colors.textMuted;
+  const label = t(`status.tx.${statut}`, { defaultValue: statut });
   return (
-    <View style={[styles.badge, { backgroundColor: `${info.color}22`, borderColor: info.color }, style]}>
-      <Text style={[styles.text, { color: info.color }]}>{info.label}</Text>
+    <View style={[styles.badge, { backgroundColor: `${color}22`, borderColor: color }, style]}>
+      <Text style={[styles.text, { color }]}>{label}</Text>
     </View>
   );
 }

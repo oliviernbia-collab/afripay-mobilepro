@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import BrandHeader from '../components/BrandHeader';
 import colors from '../theme/colors';
 
 export default function SplashScreen() {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <View style={styles.center}>
@@ -12,7 +14,7 @@ export default function SplashScreen() {
       </View>
       <View style={styles.footer}>
         <ActivityIndicator color={colors.magenta} />
-        <Text style={styles.hint}>AfriPay Pro — espace marchand</Text>
+        <Text style={styles.hint}>{t('brand.splashHint')}</Text>
       </View>
       <LinearGradient
         colors={[`${colors.orange}00`, `${colors.orange}33`]}

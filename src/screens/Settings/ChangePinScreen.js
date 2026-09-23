@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import PinDots from '../../components/PinDots';
 import PinKeypad from '../../components/PinKeypad';
 import Icon from '../../components/Icon';
@@ -11,6 +12,7 @@ const PIN_LENGTH = 4;
 const STAGES = ['enter', 'confirm'];
 
 export default function ChangePinScreen({ navigation }) {
+  const { t } = useTranslation();
   const [stage, setStage] = useState('enter'); // 'enter' | 'confirm'
   const [firstPin, setFirstPin] = useState('');
   const [pin, setPin] = useState('');
@@ -27,7 +29,7 @@ export default function ChangePinScreen({ navigation }) {
       setSuccess(true);
       setTimeout(() => navigation.goBack(), 900);
     } catch (e) {
-      setError(extractErrorMessage(e, 'Impossible de mettre à jour le code PIN.'));
+      setError(extractErrorMessage(e, t('changePin.saveError')));
       setStage('enter');
       setFirstPin('');
       setPin('');
@@ -52,7 +54,7 @@ export default function ChangePinScreen({ navigation }) {
         submit(next);
       } else {
         setTimeout(() => {
-          setError('Les codes PIN ne correspondent pas. Recommencez.');
+          setError(t('changePin.mismatchError'));
           setStage('enter');
           setFirstPin('');
           setPin('');
@@ -77,13 +79,11 @@ export default function ChangePinScreen({ navigation }) {
           <View key={s} style={[styles.progressSegment, i <= stepIndex && styles.progressSegmentDone]} />
         ))}
       </View>
-      <Text style={styles.progressLabel}>Étape {stepIndex + 1} sur {STAGES.length}</Text>
+      <Text style={styles.progressLabel}>{t('changePin.stepLabel', { current: stepIndex + 1, total: STAGES.length })}</Text>
 
-      <Text style={styles.title}>{stage === 'enter' ? 'Nouveau code PIN' : 'Confirmez votre code PIN'}</Text>
+      <Text style={styles.title}>{stage === 'enter' ? t('changePin.titleNew') : t('changePin.titleConfirm')}</Text>
       <Text style={styles.subtitle}>
-        {stage === 'enter'
-          ? 'Ce code à 4 chiffres est demandé pour confirmer les transferts à partir de 50 000 FCFA.'
-          : 'Saisissez à nouveau le même code pour le confirmer.'}
+        {stage === 'enter' ? t('changePin.subtitleCreate') : t('changePin.subtitleConfirm')}
       </Text>
 
       {error ? (
@@ -95,7 +95,7 @@ export default function ChangePinScreen({ navigation }) {
       {success ? (
         <View style={styles.successBanner}>
           <Icon name="circle-check" size={14} color={colors.success} />
-          <Text style={styles.successText}>Code PIN mis à jour.</Text>
+          <Text style={styles.successText}>{t('changePin.successText')}</Text>
         </View>
       ) : null}
 
@@ -105,9 +105,7 @@ export default function ChangePinScreen({ navigation }) {
 
       <View style={styles.securityNote}>
         <Icon name="shield-halved" size={13} color={colors.textMuted} />
-        <Text style={styles.securityNoteText}>
-          Ne partagez jamais ce code. AfriPay ne vous le demandera jamais par téléphone ou SMS.
-        </Text>
+        <Text style={styles.securityNoteText}>{t('changePin.securityNote')}</Text>
       </View>
     </View>
   );

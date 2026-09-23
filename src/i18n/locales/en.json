@@ -1,0 +1,391 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "send": "Send",
+    "continue": "Continue",
+    "confirm": "Confirm",
+    "seeAll": "See all",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "unableToReachServer": "Unable to reach the AfriPay server. Check your connection and the address configured in src/config/api.js.",
+    "timeoutError": "The server is taking too long to respond. Please try again.",
+    "genericError": "Something went wrong. Please try again."
+  },
+  "nav": {
+    "accueil": "Home",
+    "transferer": "Transfer",
+    "historique": "History",
+    "notifications": "Notifications",
+    "parametres": "Settings"
+  },
+  "language": {
+    "select": "Choose language",
+    "fr": "French",
+    "en": "English",
+    "es": "Spanish"
+  },
+  "brand": {
+    "tagline": "Pay. Send. Progress.",
+    "splashHint": "AfriPay Pro — merchant space"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version {{version}}",
+    "description": "AfriPay Pro lets merchants collect their AfriPay sales, manage transfers, and track their daily activity.",
+    "contactLabel": "Contact",
+    "emailLabel": "Email us",
+    "shareMenu": "Share the app",
+    "shareMessage": "Check out AfriPay Pro, the app that lets merchants collect their AfriPay sales, manage transfers, and track their daily activity! 🚀"
+  },
+  "terms": {
+    "title": "Terms of use",
+    "lastUpdated": "Last updated: September 23, 2026",
+    "intro": "These terms of use govern the use of the AfriPay Pro app by merchant accounts. This document is provided for informational purposes as part of this project and should be reviewed by legal counsel before any production use.",
+    "sections": [
+      { "title": "1. Purpose", "body": "AfriPay Pro is an app for merchants that lets them collect AfriPay payments, make transfers (Mobile Money or AfriPay account), and track their account activity." },
+      { "title": "2. Acceptance of terms", "body": "By creating a merchant account or using the app, you fully accept these terms of use." },
+      { "title": "3. KYB validation", "body": "Collecting payments requires your KYB file (ID document, RCCM and NCC for businesses, proof of address and activity) to be approved by our teams beforehand." },
+      { "title": "4. Account security", "body": "You are responsible for keeping your PIN code and login credentials confidential. Report any suspicious activity immediately." },
+      { "title": "5. Collections and transfers", "body": "Collections are credited to your AfriPay wallet after the customer is verified. Outgoing transfers (Mobile Money or AfriPay account) may be subject to fees, which will be shown before you confirm." },
+      { "title": "6. Disputes and refunds", "body": "Any dispute regarding a collection must be reported as soon as possible. AfriPay reserves the right to review and, where applicable, cancel a fraudulent transaction." },
+      { "title": "7. Account suspension and closure", "body": "AfriPay may suspend or close a merchant account in case of fraud, breach of these terms, or to comply with a legal or regulatory obligation." },
+      { "title": "8. Limitation of liability", "body": "AfriPay is not liable for service interruptions, third-party provider outages, or losses resulting from a merchant's negligence in protecting their credentials." },
+      { "title": "9. Changes to these terms", "body": "These terms may be updated at any time. You will be notified of any significant change via the app." },
+      { "title": "10. Contact", "body": "For any question about these terms, contact us at the address shown in the \"About\" section." }
+    ]
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "lastUpdated": "Last updated: September 23, 2026",
+    "intro": "This policy describes how AfriPay collects, uses, and protects your merchant account data. This document is provided for informational purposes as part of this project and should be reviewed by legal counsel before any production use.",
+    "sections": [
+      { "title": "1. Data we collect", "body": "We collect your business or activity information (company name, RCCM, NCC, address), your KYB documents (ID document, proof documents), as well as your collection and transfer history." },
+      { "title": "2. Purposes of processing", "body": "This data is used to create and secure your merchant account, meet our regulatory obligations (KYB/AML), process your collections and transfers, and provide support." },
+      { "title": "3. Legal basis", "body": "Processing is based on the performance of our contract with you and compliance with the legal and regulatory obligations applicable to payment activities." },
+      { "title": "4. Data retention", "body": "Your data is kept for as long as your account is active, then for the period required by regulations applicable to KYB records and financial transactions." },
+      { "title": "5. Data sharing", "body": "Your data may be shared with our payment partners (Wave, Orange Money, Moov Money, MTN MoMo) strictly to the extent necessary to process your operations, or with competent authorities where required by law. It is never sold to third parties." },
+      { "title": "6. Data security", "body": "Your PIN code is stored encrypted, and access to your data is protected and logged." },
+      { "title": "7. Your rights", "body": "You have the right to access, correct, and delete your data, within the limits of legal retention obligations. You can exercise these rights by contacting us at the address shown in the \"About\" section." },
+      { "title": "8. Changes to this policy", "body": "This policy may be updated. You will be notified of any significant change via the app." }
+    ]
+  },
+  "headers": {
+    "createAccount": "Create an account",
+    "yourInfo": "Your information",
+    "verification": "Verification",
+    "pinCode": "PIN code",
+    "encaisser": "Collect",
+    "scanPayment": "Scan AfriPay payment",
+    "receipt": "Receipt",
+    "kyb": "Account validation (KYB)",
+    "kybUpload": "Send a document",
+    "transactionDetail": "Details",
+    "changePin": "AfriPay PIN code",
+    "about": "About",
+    "support": "Get help",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy"
+  },
+  "dashboard": {
+    "greeting": "Hello",
+    "subtitle": "Merchant",
+    "kybBannerText": "Account pending validation — you'll be able to collect payments once your file is approved. Tap to complete your KYB file.",
+    "balanceLabel": "Available balance",
+    "balanceSub": "AfriPay Merchant wallet",
+    "today": "Today",
+    "todayEncaissements": "Collections",
+    "todayTransferts": "Transfers",
+    "actionEncaisser": "Collect",
+    "actionTransferer": "Transfer",
+    "actionHistorique": "History",
+    "transactionsRecent": "Recent transactions",
+    "empty": "No transactions yet.",
+    "loadError": "Unable to load your dashboard."
+  },
+  "auth": {
+    "login": {
+      "title": "Merchant space",
+      "subtitle": "Sign in to collect your AfriPay sales.",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "e.g. 0700000000",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "noAccount": "Don't have a merchant account yet?",
+      "createAccount": "Create an account",
+      "missingFields": "Please enter your phone number and password.",
+      "error": "Sign-in failed. Check your credentials."
+    },
+    "otp": {
+      "title": "Phone verification",
+      "subtitle": "A one-time code was sent to {{phone}}.",
+      "devTitle": "Development mode",
+      "devText": "The API server returns the code directly (no real SMS sent): {{code}}",
+      "codeLabel": "Verification code",
+      "verify": "Verify and create account",
+      "resend": "Resend code",
+      "missingCode": "Please enter the code you received by SMS.",
+      "invalidCode": "Invalid or expired code.",
+      "resendError": "Unable to resend the code."
+    },
+    "registerType": {
+      "title": "What type of merchant account would you like to create?",
+      "subtitle": "This choice determines the documents required to validate your file.",
+      "entrepriseTitle": "Business",
+      "entrepriseDesc": "Formal company, shop or business (company name, RCCM, NCC/NIF).",
+      "particulierTitle": "Individual",
+      "particulierDesc": "Sole trader, individual seller or informal activity."
+    },
+    "registerForm": {
+      "titleEntreprise": "Business information",
+      "titleParticulier": "Your information",
+      "subtitleEntreprise": "This information will be verified during AfriPay's KYB validation.",
+      "subtitleParticulier": "Sole trader / individual account — simplified process.",
+      "raisonSocialeLabel": "Company name *",
+      "raisonSocialePlaceholder": "Company name",
+      "rccmLabel": "RCCM *",
+      "rccmPlaceholder": "RCCM number",
+      "nccLabel": "NCC / TIN",
+      "nccPlaceholder": "Taxpayer number (optional)",
+      "phoneLabel": "Phone *",
+      "phonePlaceholder": "e.g. 0700000000",
+      "emailLabel": "Email",
+      "emailPlaceholder": "optional@example.com",
+      "passwordLabel": "Password *",
+      "passwordPlaceholder": "At least 6 characters",
+      "confirmLabel": "Confirm password *",
+      "continue": "Continue",
+      "missingEntreprise": "Company name and RCCM are required for a Business account.",
+      "missingPhone": "Phone number is required.",
+      "passwordTooShort": "The password must be at least 6 characters long.",
+      "passwordMismatch": "The passwords don't match.",
+      "error": "Unable to send the verification code."
+    },
+    "setPin": {
+      "titleCreate": "Set your AfriPay PIN code",
+      "titleConfirm": "Confirm your PIN code",
+      "subtitleCreate": "This 4-digit code will be requested to confirm transfers of 50,000 FCFA or more.",
+      "subtitleConfirm": "Enter the same code again to confirm it.",
+      "mismatchError": "The PIN codes don't match. Try again.",
+      "saveError": "Unable to set the PIN code.",
+      "later": "Set up later"
+    }
+  },
+  "encaisser": {
+    "amount": {
+      "blockedTitle": "Account pending validation",
+      "blockedText": "You'll be able to collect payments once your file is approved. Complete your KYB file to speed up verification.",
+      "completeKyb": "Complete my KYB file",
+      "title": "Amount to collect",
+      "subtitle": "Enter the amount the customer must pay.",
+      "scanButton": "Scan customer's payment",
+      "invalidAmount": "Please enter a valid amount."
+    },
+    "scan": {
+      "cameraPermTitle": "Camera access required",
+      "cameraPermText": "AfriPay Pro needs the camera to scan the payment QR code shown by the customer.",
+      "allowCamera": "Allow camera",
+      "amountLabel": "Amount to collect",
+      "verifying": "Verifying payment…",
+      "instructions": "Place the QR code shown on the customer's \"Pay\" screen inside the frame.",
+      "paymentFailed": "The payment failed."
+    },
+    "receipt": {
+      "successTitle": "Payment accepted",
+      "failTitle": "Payment declined",
+      "clientLabel": "Customer",
+      "referenceLabel": "Reference",
+      "dateLabel": "Date & time",
+      "methodLabel": "Method",
+      "methodValue": "AfriPay payment scan",
+      "requestedAmountLabel": "Requested amount",
+      "newTransaction": "New collection",
+      "backToDashboard": "Back to dashboard",
+      "retry": "Retry scan",
+      "changeAmount": "Change amount"
+    }
+  },
+  "historique": {
+    "title": "History",
+    "exportTitle": "Export history",
+    "exportEmpty": "No transactions to export.",
+    "exportError": "Unable to generate the export.",
+    "exportUnavailable": "File sharing isn't available on this device.",
+    "csv": {
+      "date": "Date",
+      "type": "Type",
+      "amount": "Amount",
+      "status": "Status",
+      "method": "Method",
+      "number": "Number",
+      "reference": "Reference",
+      "label": "Label"
+    },
+    "periodToday": "Today",
+    "periodWeek": "This week",
+    "periodMonth": "This month",
+    "totalCollected": "Total collected",
+    "transactionsCount": "Transactions",
+    "filterAll": "All",
+    "filterEncaissements": "Collections",
+    "filterTransferts": "Transfers",
+    "filterRecharges": "Top-ups",
+    "empty": "No transactions found.",
+    "loadError": "Unable to load your history."
+  },
+  "historiqueDetail": {
+    "typeLabel": "Type",
+    "methodLabel": "Method",
+    "numberLabel": "Number",
+    "libelleLabel": "Label",
+    "referenceLabel": "Reference",
+    "dateLabel": "Date & time",
+    "feesLabel": "Fees",
+    "statusLabel": "Status"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet.",
+    "loadError": "Unable to load notifications.",
+    "markAllError": "Unable to mark everything as read."
+  },
+  "sideMenu": {
+    "allSettings": "All settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "defaultMerchantName": "AfriPay Merchant",
+    "typeLabel": "Account type",
+    "typeEntreprise": "Business",
+    "typeParticulier": "Individual",
+    "emailLabel": "Email",
+    "rccmLabel": "RCCM",
+    "nccLabel": "NCC / TIN",
+    "sectionAccount": "Account",
+    "sectionHelp": "Help",
+    "sectionLegal": "Legal",
+    "kybMenu": "Account validation (KYB)",
+    "pinMenu": "Change my PIN code",
+    "helpMenu": "Get help",
+    "shareApp": "Share the app",
+    "termsMenu": "Terms of use",
+    "privacyMenu": "Privacy policy",
+    "logout": "Log out",
+    "logoutConfirmTitle": "Log out",
+    "logoutConfirmText": "Are you sure you want to log out?"
+  },
+  "support": {
+    "title": "Get help",
+    "faqSectionLabel": "Frequently asked questions",
+    "faq": [
+      {
+        "q": "When can I start collecting payments?",
+        "a": "As soon as your KYB file is approved by an AfriPay agent from the back office. Track the status in the 'Account validation' section."
+      },
+      {
+        "q": "How does the payment scan work?",
+        "a": "The customer shows a QR code on their AfriPay app (\"Pay\" screen). You scan this code with the camera to collect the amount — it replaces real palm recognition in this version."
+      },
+      {
+        "q": "Is the PIN code mandatory?",
+        "a": "It's only required to confirm transfers (Mobile Money or AfriPay account) of 50,000 FCFA or more."
+      }
+    ]
+  },
+  "changePin": {
+    "stepLabel": "Step {{current}} of {{total}}",
+    "titleNew": "New PIN code",
+    "titleConfirm": "Confirm your PIN code",
+    "subtitleCreate": "This 4-digit code is requested to confirm transfers of 50,000 FCFA or more.",
+    "subtitleConfirm": "Enter the same code again to confirm it.",
+    "mismatchError": "The PIN codes don't match. Try again.",
+    "saveError": "Unable to update the PIN code.",
+    "successText": "PIN code updated.",
+    "securityNote": "Never share this code. AfriPay will never ask for it by phone or SMS."
+  },
+  "kyb": {
+    "home": {
+      "statusLabel": "KYB validation status",
+      "statusPendingHint": "File under review — Our team is verifying the information. You'll be notified once approved. Send the required documents below.",
+      "statusOkHint": "Your account is approved, you can collect payments.",
+      "requiredDocsLabel": "Required documents ({{type}})",
+      "typeEntreprise": "Business",
+      "typeParticulier": "Individual",
+      "sentStatus": "Sent — pending verification",
+      "notSentStatus": "Not sent",
+      "loadError": "Unable to load your documents.",
+      "docLabels": {
+        "cni": "National ID card",
+        "passeport": "Passport",
+        "carte_sejour": "Residence permit",
+        "selfie": "Verification selfie",
+        "rccm": "Trade register (RCCM)",
+        "ncc": "NCC / TIN (tax ID)",
+        "justificatif_domicile": "Proof of address",
+        "justificatif_activite": "Proof of activity"
+      }
+    },
+    "upload": {
+      "permissionDenied": "Permission denied. Allow camera/photo access in your phone's settings.",
+      "photoRequired": "Please select or take a photo of the document.",
+      "subtitle": "Take a clear, readable photo of the document, or choose one from your gallery.",
+      "send": "Send document",
+      "sentSuccess": "Document sent successfully.",
+      "sendError": "Failed to send the document."
+    }
+  },
+  "transfer": {
+    "title": "Transfer",
+    "tabExternal": "To Mobile Money",
+    "tabInternal": "To an AfriPay account",
+    "operatorLabel": "Operator",
+    "externalNumberLabel": "Recipient number",
+    "internalNumberLabel": "Recipient's phone",
+    "numberPlaceholder": "e.g. 0700000000",
+    "amountLabel": "Amount (FCFA)",
+    "pinLabel": "AfriPay PIN code",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Reason for transfer",
+    "submit": "Send",
+    "missingFieldsExternal": "Enter the destination number and amount.",
+    "missingFieldsInternal": "Enter the recipient's number and amount.",
+    "pinRequired": "PIN code required for transfers of {{amount}} FCFA or more.",
+    "successExternal": "Transfer successfully sent to {{operator}}.",
+    "successInternal": "AfriPay transfer completed successfully.",
+    "genericError": "The transfer failed."
+  },
+  "status": {
+    "kyb": {
+      "validé": "Approved",
+      "en_attente": "Pending",
+      "rejeté": "Rejected",
+      "suspendu": "Suspended",
+      "unknown": "Unknown"
+    },
+    "tx": {
+      "réussi": "Successful",
+      "échoué": "Failed",
+      "en_attente": "Pending"
+    }
+  },
+  "txType": {
+    "achat": "Collection",
+    "transfert": "Transfer",
+    "recharge": "Top-up"
+  },
+  "txMethod": {
+    "paume_de_main": "AfriPay payment scan",
+    "mobile_money": "Mobile Money",
+    "carte_visa": "Visa card",
+    "interne": "AfriPay internal transfer"
+  },
+  "providers": {
+    "wave": "Wave",
+    "orange_money": "Orange Money",
+    "moov_money": "Moov Money",
+    "mtn_money": "MTN Money"
+  }
+}

@@ -1,6 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Card from '../../components/Card';
@@ -10,20 +13,14 @@ import { getMyHistory, getMyStats, getMyWallet } from '../../api/wallet';
 import { formatFcfa, formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
 
-const PERIODS = [
-  { value: 'jour', label: "Aujourd'hui" },
-  { value: 'semaine', label: 'Cette semaine' },
-  { value: 'mois', label: 'Ce mois' },
-];
-
-const TYPE_FILTERS = [
-  { value: undefined, label: 'Tous' },
-  { value: 'achat', label: 'Encaissements' },
-  { value: 'transfert', label: 'Transferts' },
-  { value: 'recharge', label: 'Recharges' },
-];
+// CSV field escaping: wrap in quotes and double any internal quotes (RFC 4180).
+function csvCell(value) {
+  const str = value === null || value === undefined ? '' : String(value);
+  return `"${str.replace(/"/g, '""')}"`;
+}
 
 export default function HistoriqueScreen({ navigation }) {
+  const { t } = useTranslation();
   const [walletId, setWalletId] = useState(null);
   const [period, setPeriod] = useState('jour');
   const [typeFilter, setTypeFilter] = useState(undefined);
@@ -32,6 +29,20 @@ export default function HistoriqueScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+  const [exporting, setExporting] = useState(false);
+
+  const PERIODS = [
+    { value: 'jour', label: t('historique.periodToday') },
+    { value: 'semaine', label: t('historique.periodWeek') },
+    { value: 'mois', label: t('historique.periodMonth') },
+  ];
+
+  const TYPE_FILTERS = [
+    { value: undefined, label: t('historique.filterAll') },
+    { value: 'achat', label: t('historique.filterEncaissements') },
+    { value: 'transfert', label: t('historique.filterTransferts') },
+    { value: 'recharge', label: t('historique.filterRecharges') },
+  ];
 
   const load = useCallback(async () => {
     setError('');
@@ -45,9 +56,9 @@ export default function HistoriqueScreen({ navigation }) {
       setTransactions(history);
       setStats(statsData);
     } catch (e) {
-      setError(extractErrorMessage(e, "Impossible de charger l'historique."));
+      setError(extractErrorMessage(e, t('historique.loadError')));
     }
-  }, [typeFilter, period]);
+  }, [typeFilter, period, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -62,19 +73,68 @@ export default function HistoriqueScreen({ navigation }) {
     setRefreshing(false);
   };
 
+  const onExport = async () => {
+    if (!transactions.length) {
+      Alert.alert(t('historique.exportTitle'), t('historique.exportEmpty'));
+      return;
+    }
+    setExporting(true);
+    try {
+      const canShare = await Sharing.isAvailableAsync();
+      if (!canShare) {
+        Alert.alert(t('historique.exportTitle'), t('historique.exportUnavailable'));
+        return;
+      }
+
+      const header = [
+        t('historique.csv.date'),
+        t('historique.csv.type'),
+        t('historique.csv.amount'),
+        t('historique.csv.status'),
+        t('historique.csv.method'),
+        t('historique.csv.number'),
+        t('historique.csv.reference'),
+        t('historique.csv.label'),
+      ];
+      const rows = transactions.map((tx) => [
+        formatDateTime(tx.date_heure),
+        t(`txType.${tx.type}`, { defaultValue: tx.type }),
+        formatFcfa(tx.montant),
+        t(`status.tx.${tx.statut}`, { defaultValue: tx.statut }),
+        t(`txMethod.${tx['méthode']}`, { defaultValue: tx['méthode'] || '' }),
+        tx.contrepartie?.telephone || '',
+        tx.reference,
+        tx.libelle || '',
+      ]);
+      const csvContent = [header, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n');
+      // Excel needs a UTF-8 BOM to render accented characters correctly.
+      const csv = '﻿' + csvContent;
+
+      const file = new File(Paths.cache, `afripay-historique-${Date.now()}.csv`);
+      if (!file.exists) file.create();
+      file.write(csv);
+
+      await Sharing.shareAsync(file.uri, { mimeType: 'text/csv', dialogTitle: t('historique.exportTitle') });
+    } catch (e) {
+      Alert.alert(t('historique.exportTitle'), extractErrorMessage(e, t('historique.exportError')));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const totalPeriod = stats.reduce((sum, s) => sum + Number(s.total || 0), 0);
   const countPeriod = stats.reduce((sum, s) => sum + Number(s.nombre || 0), 0);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Historique</Text>
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert('Export', 'Bientôt disponible — l\'export CSV/PDF sera ajouté dans une prochaine version.')
-          }
-        >
-          <Icon name="download" size={22} color={colors.blue} />
+        <Text style={styles.title}>{t('historique.title')}</Text>
+        <TouchableOpacity onPress={onExport} disabled={exporting} hitSlop={10}>
+          {exporting ? (
+            <ActivityIndicator size="small" color={colors.blue} />
+          ) : (
+            <Icon name="download" size={22} color={colors.blue} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -93,11 +153,11 @@ export default function HistoriqueScreen({ navigation }) {
       <Card style={styles.statsCard}>
         <View style={styles.statsRow}>
           <View>
-            <Text style={styles.statsLabel}>Total encaissé</Text>
+            <Text style={styles.statsLabel}>{t('historique.totalCollected')}</Text>
             <Text style={styles.statsValue}>{formatFcfa(totalPeriod)}</Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <Text style={styles.statsLabel}>Transactions</Text>
+            <Text style={styles.statsLabel}>{t('historique.transactionsCount')}</Text>
             <Text style={styles.statsValue}>{countPeriod}</Text>
           </View>
         </View>
@@ -126,7 +186,7 @@ export default function HistoriqueScreen({ navigation }) {
         ListEmptyComponent={
           !loading ? (
             <Card style={styles.emptyCard}>
-              <Text style={styles.emptyText}>{error || 'Aucune transaction trouvée.'}</Text>
+              <Text style={styles.emptyText}>{error || t('historique.empty')}</Text>
             </Card>
           ) : null
         }

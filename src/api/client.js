@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { API_BASE_URL } from '../config/api';
+import i18n from '../i18n';
 
 const ACCESS_TOKEN_KEY = 'afripay_pro_access_token';
 const REFRESH_TOKEN_KEY = 'afripay_pro_refresh_token';
@@ -102,13 +103,13 @@ api.interceptors.response.use(
 );
 
 // Normalizes both axios/network errors and API error payloads into a
-// friendly French message, so screens can just display err.message.
-export function extractErrorMessage(error, fallback = 'Une erreur est survenue. Veuillez réessayer.') {
+// friendly, localized message, so screens can just display err.message.
+export function extractErrorMessage(error, fallback = i18n.t('common.genericError')) {
   if (error?.response?.data?.message) return error.response.data.message;
   if (error?.message === 'Network Error') {
-    return "Impossible de joindre le serveur AfriPay. Vérifiez votre connexion et l'adresse configurée dans src/config/api.js.";
+    return i18n.t('common.unableToReachServer');
   }
-  if (error?.code === 'ECONNABORTED') return 'Le serveur met trop de temps à répondre. Réessayez.';
+  if (error?.code === 'ECONNABORTED') return i18n.t('common.timeoutError');
   return fallback;
 }
 

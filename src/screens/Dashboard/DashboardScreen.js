@@ -1,11 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { LinearGradient } from 'expo-linear-gradient';
 import colors, { gradients, radii } from '../../theme/colors';
 import Card from '../../components/Card';
 import { KybBadge, TransactionStatusBadge } from '../../components/StatusBadge';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
+import SideMenu from '../../components/SideMenu';
 import { useAuth } from '../../context/AuthContext';
 import { getMyWallet, getMyHistory, getMyStats } from '../../api/wallet';
 import { formatFcfa, formatDateTime } from '../../utils/format';
@@ -14,14 +17,9 @@ import TxTypeIcon from '../../components/TxTypeIcon';
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-const ACTIONS = [
-  { key: 'encaisser', label: 'Encaisser', icon: 'qrcode', color: colors.magenta, route: 'EncaisserAmount' },
-  { key: 'transferer', label: 'Transférer', icon: 'right-left', color: colors.blue, route: 'Transferer' },
-  { key: 'historique', label: 'Historique', icon: 'clock-rotate-left', color: colors.turquoise, route: 'Historique' },
-];
-
 export default function DashboardScreen({ navigation }) {
-  const { merchant, isKybValidated, refreshMerchant } = useAuth();
+  const { t } = useTranslation();
+  const { merchant, isKybValidated, refreshMerchant, logout } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [todayEncaisse, setTodayEncaisse] = useState(0);
@@ -30,6 +28,13 @@ export default function DashboardScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [balanceHidden, setBalanceHidden] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const ACTIONS = [
+    { key: 'encaisser', label: t('dashboard.actionEncaisser'), icon: 'qrcode', color: colors.magenta, route: 'EncaisserAmount' },
+    { key: 'transferer', label: t('dashboard.actionTransferer'), icon: 'right-left', color: colors.blue, route: 'Transferer' },
+    { key: 'historique', label: t('dashboard.actionHistorique'), icon: 'clock-rotate-left', color: colors.turquoise, route: 'Historique' },
+  ];
 
   const loadData = useCallback(async () => {
     setError('');
@@ -44,12 +49,16 @@ export default function DashboardScreen({ navigation }) {
       ]);
       setWallet(w);
       setTransactions(h);
-      setTodayEncaisse(stats.reduce((sum, s) => sum + Number(s.total || 0), 0));
-      setTodayTransfere(transfersToday.reduce((sum, t) => sum + Number(t.montant || 0), 0));
+      // getMyStats('jour') returns one row per day over the last 30 days (most recent first) —
+      // summing the whole array (as before) showed a slow-moving 30-day total mislabeled as
+      // "today" instead of today's own figure. Pick out just today's bucket.
+      const todayStats = stats.find((s) => s.periode === today);
+      setTodayEncaisse(Number(todayStats?.total || 0));
+      setTodayTransfere(transfersToday.reduce((sum, t2) => sum + Number(t2.montant || 0), 0));
     } catch (e) {
-      setError(extractErrorMessage(e, 'Impossible de charger votre tableau de bord.'));
+      setError(extractErrorMessage(e, t('dashboard.loadError')));
     }
-  }, [refreshMerchant]);
+  }, [refreshMerchant, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -64,6 +73,13 @@ export default function DashboardScreen({ navigation }) {
     setRefreshing(false);
   };
 
+  const confirmLogout = () => {
+    Alert.alert(t('settings.logoutConfirmTitle'), t('settings.logoutConfirmText'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('settings.logout'), style: 'destructive', onPress: logout },
+    ]);
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -71,15 +87,17 @@ export default function DashboardScreen({ navigation }) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.magenta} />}
     >
       <View style={styles.header}>
-        <View style={styles.avatar}>
+        <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.avatar} activeOpacity={0.8}>
           <Icon name="store" size={20} color={colors.text} />
-        </View>
+        </TouchableOpacity>
         <View style={styles.greetingTextWrap}>
           <Text style={styles.greeting} numberOfLines={1}>
-            Bonjour{merchant?.raison_sociale ? `, ${merchant.raison_sociale}` : ''}
+            {t('dashboard.greeting')}
+            {merchant?.raison_sociale ? `, ${merchant.raison_sociale}` : ''}
           </Text>
-          <Text style={styles.greetingSub}>Marchand</Text>
+          <Text style={styles.greetingSub}>{t('dashboard.subtitle')}</Text>
         </View>
+        <LanguageSwitcher />
         <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.bellBtn}>
           <Icon name="bell" size={18} color={colors.turquoise} />
         </TouchableOpacity>
@@ -89,10 +107,7 @@ export default function DashboardScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate('Kyb')} activeOpacity={0.85}>
           <View style={styles.kybBanner}>
             <Icon name="triangle-exclamation" size={20} color={colors.warning} />
-            <Text style={styles.kybBannerText}>
-              Compte en attente de validation — vous pourrez encaisser dès que votre dossier sera validé.
-              Appuyez pour compléter votre dossier KYB.
-            </Text>
+            <Text style={styles.kybBannerText}>{t('dashboard.kybBannerText')}</Text>
             <Icon name="chevron-right" size={18} color={colors.warning} />
           </View>
         </TouchableOpacity>
@@ -104,7 +119,7 @@ export default function DashboardScreen({ navigation }) {
             <View style={styles.balanceIconWrap}>
               <Icon name="wallet" size={13} color={colors.text} />
             </View>
-            <Text style={styles.balanceLabel}>Solde disponible</Text>
+            <Text style={styles.balanceLabel}>{t('dashboard.balanceLabel')}</Text>
             <TouchableOpacity onPress={() => setBalanceHidden((v) => !v)} hitSlop={10}>
               <Icon name={balanceHidden ? 'eye-slash' : 'eye'} size={15} color="rgba(255,255,255,0.75)" />
             </TouchableOpacity>
@@ -114,18 +129,18 @@ export default function DashboardScreen({ navigation }) {
         <Text style={styles.balanceAmount}>
           {loading ? '···' : balanceHidden ? '•••••• FCFA' : formatFcfa(wallet?.solde)}
         </Text>
-        <Text style={styles.balanceSub}>Portefeuille AfriPay Marchand</Text>
+        <Text style={styles.balanceSub}>{t('dashboard.balanceSub')}</Text>
       </LinearGradient>
 
       <View style={styles.todayRow}>
-        <Text style={styles.todayTitle}>Aujourd&apos;hui</Text>
+        <Text style={styles.todayTitle}>{t('dashboard.today')}</Text>
         <View style={styles.todayStatsRow}>
           <View style={styles.todayStat}>
-            <Text style={styles.todayStatLabel}>Encaissements</Text>
+            <Text style={styles.todayStatLabel}>{t('dashboard.todayEncaissements')}</Text>
             <Text style={styles.todayStatValue}>{formatFcfa(todayEncaisse)}</Text>
           </View>
           <View style={styles.todayStat}>
-            <Text style={styles.todayStatLabel}>Transferts</Text>
+            <Text style={styles.todayStatLabel}>{t('dashboard.todayTransferts')}</Text>
             <Text style={styles.todayStatValue}>{formatFcfa(todayTransfere)}</Text>
           </View>
         </View>
@@ -150,15 +165,15 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Transactions récentes</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.transactionsRecent')}</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Historique')}>
-          <Text style={styles.sectionLink}>Voir tout</Text>
+          <Text style={styles.sectionLink}>{t('common.seeAll')}</Text>
         </TouchableOpacity>
       </View>
 
       {transactions.length === 0 && !loading ? (
         <Card style={styles.emptyCard}>
-          <Text style={styles.emptyText}>Aucune transaction pour le moment.</Text>
+          <Text style={styles.emptyText}>{t('dashboard.empty')}</Text>
         </Card>
       ) : (
         transactions.map((tx) => (
@@ -187,6 +202,14 @@ export default function DashboardScreen({ navigation }) {
           </Card>
         ))
       )}
+
+      <SideMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        merchant={merchant}
+        navigation={navigation}
+        onLogout={confirmLogout}
+      />
     </ScrollView>
   );
 }
@@ -204,6 +227,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    gap: 8,
   },
   bellBtn: {
     width: 38,
@@ -223,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  greetingTextWrap: { flex: 1, marginHorizontal: 12 },
+  greetingTextWrap: { flex: 1, marginLeft: 12 },
   greeting: {
     color: colors.text,
     fontSize: 17,

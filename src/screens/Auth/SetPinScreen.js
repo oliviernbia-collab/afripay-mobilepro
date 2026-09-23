@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import PinDots from '../../components/PinDots';
 import PinKeypad from '../../components/PinKeypad';
 import GradientButton from '../../components/GradientButton';
@@ -10,6 +11,7 @@ import { extractErrorMessage } from '../../api/client';
 const PIN_LENGTH = 4;
 
 export default function SetPinScreen({ navigation }) {
+  const { t } = useTranslation();
   const [stage, setStage] = useState('enter'); // 'enter' | 'confirm'
   const [firstPin, setFirstPin] = useState('');
   const [pin, setPin] = useState('');
@@ -26,7 +28,7 @@ export default function SetPinScreen({ navigation }) {
       await setMerchantPin(confirmedPin);
       finish();
     } catch (e) {
-      setError(extractErrorMessage(e, 'Impossible de définir le code PIN.'));
+      setError(extractErrorMessage(e, t('auth.setPin.saveError')));
       setStage('enter');
       setFirstPin('');
       setPin('');
@@ -51,7 +53,7 @@ export default function SetPinScreen({ navigation }) {
         submit(next);
       } else {
         setTimeout(() => {
-          setError('Les codes PIN ne correspondent pas. Recommencez.');
+          setError(t('auth.setPin.mismatchError'));
           setStage('enter');
           setFirstPin('');
           setPin('');
@@ -67,11 +69,11 @@ export default function SetPinScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{stage === 'enter' ? 'Définissez votre code PIN AfriPay' : 'Confirmez votre code PIN'}</Text>
+      <Text style={styles.title}>
+        {stage === 'enter' ? t('auth.setPin.titleCreate') : t('auth.setPin.titleConfirm')}
+      </Text>
       <Text style={styles.subtitle}>
-        {stage === 'enter'
-          ? 'Ce code à 4 chiffres vous sera demandé pour confirmer les transferts à partir de 50 000 FCFA.'
-          : 'Saisissez à nouveau le même code pour le confirmer.'}
+        {stage === 'enter' ? t('auth.setPin.subtitleCreate') : t('auth.setPin.subtitleConfirm')}
       </Text>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -80,7 +82,7 @@ export default function SetPinScreen({ navigation }) {
 
       <PinKeypad onDigit={onDigit} onBackspace={onBackspace} disabled={loading} />
 
-      <GradientButton title="Configurer plus tard" onPress={finish} variant="ghost" style={{ marginTop: 20 }} />
+      <GradientButton title={t('auth.setPin.later')} onPress={finish} variant="ghost" style={{ marginTop: 20 }} />
     </View>
   );
 }

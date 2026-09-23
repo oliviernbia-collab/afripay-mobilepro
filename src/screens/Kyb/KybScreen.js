@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Card from '../../components/Card';
@@ -8,17 +9,6 @@ import { KybBadge } from '../../components/StatusBadge';
 import { useAuth } from '../../context/AuthContext';
 import { getMyMerchantDocuments } from '../../api/kyc';
 import { extractErrorMessage } from '../../api/client';
-
-const DOC_LABELS = {
-  cni: "Carte Nationale d'Identité",
-  passeport: 'Passeport',
-  carte_sejour: 'Carte de séjour',
-  selfie: 'Selfie de vérification',
-  rccm: 'Registre de commerce (RCCM)',
-  ncc: 'NCC / NIF (identifiant fiscal)',
-  justificatif_domicile: 'Justificatif de domicile',
-  justificatif_activite: "Justificatif d'activité",
-};
 
 function requiredDocsFor(type) {
   if (type === 'entreprise') {
@@ -28,11 +18,14 @@ function requiredDocsFor(type) {
 }
 
 export default function KybScreen({ navigation }) {
+  const { t } = useTranslation();
   const { merchant, refreshMerchant } = useAuth();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+
+  const DOC_LABELS = t('kyb.home.docLabels', { returnObjects: true });
 
   const load = useCallback(async () => {
     setError('');
@@ -40,9 +33,9 @@ export default function KybScreen({ navigation }) {
       const [docs] = await Promise.all([getMyMerchantDocuments(), refreshMerchant()]);
       setDocuments(docs);
     } catch (e) {
-      setError(extractErrorMessage(e, 'Impossible de charger vos documents.'));
+      setError(extractErrorMessage(e, t('kyb.home.loadError')));
     }
-  }, [refreshMerchant]);
+  }, [refreshMerchant, t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -67,21 +60,22 @@ export default function KybScreen({ navigation }) {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.magenta} />}
     >
       <Card style={styles.statusCard}>
-        <Text style={styles.statusLabel}>Statut de validation KYB</Text>
+        <Text style={styles.statusLabel}>{t('kyb.home.statusLabel')}</Text>
         <KybBadge statut={merchant?.statut_kyb} style={{ marginTop: 8 }} />
         {merchant?.statut_kyb !== 'validé' ? (
-          <Text style={styles.statusHint}>
-            Dossier en cours de validation — Notre équipe vérifie les informations. Vous serez notifié dès la
-            validation. Envoyez les documents requis ci-dessous.
-          </Text>
+          <Text style={styles.statusHint}>{t('kyb.home.statusPendingHint')}</Text>
         ) : (
-          <Text style={styles.statusHintOk}>Votre compte est validé, vous pouvez encaisser des paiements.</Text>
+          <Text style={styles.statusHintOk}>{t('kyb.home.statusOkHint')}</Text>
         )}
       </Card>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <Text style={styles.sectionTitle}>Documents requis ({merchant?.type === 'entreprise' ? 'Entreprise' : 'Particulier'})</Text>
+      <Text style={styles.sectionTitle}>
+        {t('kyb.home.requiredDocsLabel', {
+          type: merchant?.type === 'entreprise' ? t('kyb.home.typeEntreprise') : t('kyb.home.typeParticulier'),
+        })}
+      </Text>
 
       {required.map((docType) => {
         const submitted = submittedTypes.has(docType);
@@ -101,7 +95,7 @@ export default function KybScreen({ navigation }) {
               </View>
               <View style={styles.docText}>
                 <Text style={styles.docLabel}>{DOC_LABELS[docType]}</Text>
-                <Text style={styles.docStatus}>{submitted ? 'Envoyé — en attente de vérification' : 'Non envoyé'}</Text>
+                <Text style={styles.docStatus}>{submitted ? t('kyb.home.sentStatus') : t('kyb.home.notSentStatus')}</Text>
               </View>
               <Icon name="chevron-right" size={18} color={colors.textMuted} />
             </Card>

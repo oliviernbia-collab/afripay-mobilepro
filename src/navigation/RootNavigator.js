@@ -1,5 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
 import colors from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,18 +17,23 @@ import KybUploadScreen from '../screens/Kyb/KybUploadScreen';
 
 import TransactionDetailScreen from '../screens/Historique/TransactionDetailScreen';
 import ChangePinScreen from '../screens/Settings/ChangePinScreen';
+import AboutScreen from '../screens/Settings/AboutScreen';
+import SupportScreen from '../screens/Settings/SupportScreen';
+import TermsScreen from '../screens/Settings/TermsScreen';
+import PrivacyScreen from '../screens/Settings/PrivacyScreen';
 
 const Stack = createNativeStackNavigator();
 
-const screenOptions = {
-  headerStyle: { backgroundColor: colors.background },
-  headerTintColor: colors.text,
-  headerShadowVisible: false,
-  contentStyle: { backgroundColor: colors.background },
-};
-
 export default function RootNavigator() {
+  const { t } = useTranslation();
   const { initializing, isAuthenticated } = useAuth();
+
+  const screenOptions = {
+    headerStyle: { backgroundColor: colors.background },
+    headerTintColor: colors.text,
+    headerShadowVisible: false,
+    contentStyle: { backgroundColor: colors.background },
+  };
 
   if (initializing) {
     return <SplashScreen />;
@@ -41,23 +47,31 @@ export default function RootNavigator() {
         <>
           <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
 
-          <Stack.Screen name="EncaisserAmount" component={AmountScreen} options={{ title: 'Encaisser' }} />
+          <Stack.Screen name="EncaisserAmount" component={AmountScreen} options={{ title: t('headers.encaisser') }} />
           <Stack.Screen
             name="EncaisserScan"
             component={ScanScreen}
-            options={{ title: 'Scanner le paiement AfriPay', headerBackVisible: true }}
+            options={{ title: t('headers.scanPayment'), headerBackVisible: true }}
           />
           <Stack.Screen
             name="EncaisserReceipt"
             component={ReceiptScreen}
-            options={{ title: 'Reçu', headerBackVisible: false, gestureEnabled: false }}
+            options={{ title: t('headers.receipt'), headerBackVisible: false, gestureEnabled: false }}
           />
 
-          <Stack.Screen name="Kyb" component={KybScreen} options={{ title: 'Validation du compte (KYB)' }} />
-          <Stack.Screen name="KybUpload" component={KybUploadScreen} options={{ title: 'Envoyer un document' }} />
+          <Stack.Screen name="Kyb" component={KybScreen} options={{ title: t('headers.kyb') }} />
+          <Stack.Screen name="KybUpload" component={KybUploadScreen} options={{ title: t('headers.kybUpload') }} />
 
-          <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} options={{ title: 'Détail' }} />
-          <Stack.Screen name="ChangePin" component={ChangePinScreen} options={{ title: 'Code PIN AfriPay' }} />
+          <Stack.Screen
+            name="TransactionDetail"
+            component={TransactionDetailScreen}
+            options={{ title: t('headers.transactionDetail') }}
+          />
+          <Stack.Screen name="ChangePin" component={ChangePinScreen} options={{ title: t('headers.changePin') }} />
+          <Stack.Screen name="About" component={AboutScreen} options={{ title: t('headers.about') }} />
+          <Stack.Screen name="Support" component={SupportScreen} options={{ title: t('headers.support') }} />
+          <Stack.Screen name="Terms" component={TermsScreen} options={{ title: t('headers.terms') }} />
+          <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ title: t('headers.privacy') }} />
         </>
       )}
     </Stack.Navigator>

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { gradients } from '../../theme/colors';
 import GradientButton from '../../components/GradientButton';
@@ -11,6 +12,7 @@ import { encaisser } from '../../api/marchand';
 import { extractErrorMessage } from '../../api/client';
 
 export default function ScanScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { montant } = route.params;
   const [permission, requestPermission] = useCameraPermissions();
   const [scanning, setScanning] = useState(true);
@@ -39,7 +41,7 @@ export default function ScanScreen({ route, navigation }) {
       navigation.replace('EncaisserReceipt', {
         success: false,
         montant,
-        errorMessage: extractErrorMessage(e, 'Le paiement a échoué.'),
+        errorMessage: extractErrorMessage(e, t('encaisser.scan.paymentFailed')),
       });
     }
   };
@@ -56,11 +58,13 @@ export default function ScanScreen({ route, navigation }) {
     return (
       <View style={styles.centered}>
         <Icon name="camera" size={48} color={colors.textMuted} />
-        <Text style={styles.permTitle}>Accès à la caméra requis</Text>
-        <Text style={styles.permText}>
-          AfriPay Pro a besoin de la caméra pour scanner le QR code de paiement présenté par le client.
-        </Text>
-        <GradientButton title="Autoriser la caméra" onPress={requestPermission} style={{ marginTop: 20, width: '100%' }} />
+        <Text style={styles.permTitle}>{t('encaisser.scan.cameraPermTitle')}</Text>
+        <Text style={styles.permText}>{t('encaisser.scan.cameraPermText')}</Text>
+        <GradientButton
+          title={t('encaisser.scan.allowCamera')}
+          onPress={requestPermission}
+          style={{ marginTop: 20, width: '100%' }}
+        />
       </View>
     );
   }
@@ -68,7 +72,7 @@ export default function ScanScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.amountBar}>
-        <Text style={styles.amountLabel}>Montant à encaisser</Text>
+        <Text style={styles.amountLabel}>{t('encaisser.scan.amountLabel')}</Text>
         <Text style={styles.amountValue}>{formatFcfa(montant)}</Text>
       </View>
 
@@ -98,14 +102,12 @@ export default function ScanScreen({ route, navigation }) {
         {processing ? (
           <View style={styles.processingOverlay}>
             <ActivityIndicator size="large" color={colors.text} />
-            <Text style={styles.processingText}>Vérification du paiement…</Text>
+            <Text style={styles.processingText}>{t('encaisser.scan.verifying')}</Text>
           </View>
         ) : null}
       </View>
 
-      <Text style={styles.instructions}>
-        Placez le QR code affiché sur l'écran "Payer" du client dans le cadre.
-      </Text>
+      <Text style={styles.instructions}>{t('encaisser.scan.instructions')}</Text>
     </View>
   );
 }

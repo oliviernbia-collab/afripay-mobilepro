@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import GradientButton from '../../components/GradientButton';
@@ -8,6 +9,7 @@ import { uploadMerchantDocument } from '../../api/kyc';
 import { extractErrorMessage } from '../../api/client';
 
 export default function KybUploadScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { typeDocument, label } = route.params;
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function KybUploadScreen({ route, navigation }) {
       : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
-      setError("Permission refusée. Autorisez l'accès à la caméra/aux photos dans les réglages de votre téléphone.");
+      setError(t('kyb.upload.permissionDenied'));
       return;
     }
 
@@ -36,7 +38,7 @@ export default function KybUploadScreen({ route, navigation }) {
 
   const handleUpload = async () => {
     if (!image) {
-      setError('Veuillez sélectionner ou prendre une photo du document.');
+      setError(t('kyb.upload.photoRequired'));
       return;
     }
     setLoading(true);
@@ -51,7 +53,7 @@ export default function KybUploadScreen({ route, navigation }) {
       setSuccess(true);
       setTimeout(() => navigation.goBack(), 900);
     } catch (e) {
-      setError(extractErrorMessage(e, "Échec de l'envoi du document."));
+      setError(extractErrorMessage(e, t('kyb.upload.sendError')));
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export default function KybUploadScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{label}</Text>
-      <Text style={styles.subtitle}>Prenez une photo nette et lisible du document, ou choisissez-en une depuis votre galerie.</Text>
+      <Text style={styles.subtitle}>{t('kyb.upload.subtitle')}</Text>
 
       <View style={styles.preview}>
         {image ? (
@@ -73,18 +75,18 @@ export default function KybUploadScreen({ route, navigation }) {
       <View style={styles.row}>
         <TouchableOpacity style={styles.pickBtn} onPress={() => pickImage(true)}>
           <Icon name="camera" size={20} color={colors.text} />
-          <Text style={styles.pickBtnText}>Caméra</Text>
+          <Text style={styles.pickBtnText}>{t('common.camera')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.pickBtn} onPress={() => pickImage(false)}>
           <Icon name="images" size={20} color={colors.text} />
-          <Text style={styles.pickBtnText}>Galerie</Text>
+          <Text style={styles.pickBtnText}>{t('common.gallery')}</Text>
         </TouchableOpacity>
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      {success ? <Text style={styles.successText}>Document envoyé avec succès.</Text> : null}
+      {success ? <Text style={styles.successText}>{t('kyb.upload.sentSuccess')}</Text> : null}
 
-      <GradientButton title="Envoyer le document" onPress={handleUpload} loading={loading} style={{ marginTop: 12 }} />
+      <GradientButton title={t('kyb.upload.send')} onPress={handleUpload} loading={loading} style={{ marginTop: 12 }} />
     </View>
   );
 }

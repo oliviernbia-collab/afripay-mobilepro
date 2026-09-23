@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
-import colors, { radii } from '../../theme/colors';
+import colors from '../../theme/colors';
 import Card from '../../components/Card';
 import GradientButton from '../../components/GradientButton';
 import { formatFcfa, formatDateTime } from '../../utils/format';
 
 export default function ReceiptScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { success, montant, result, errorMessage } = route.params;
 
   const goDashboard = () => {
@@ -24,18 +26,27 @@ export default function ReceiptScreen({ route, navigation }) {
         <View style={styles.checkWrap}>
           <Icon name="circle-check" size={88} color={colors.success} />
         </View>
-        <Text style={styles.successTitle}>Paiement accepté</Text>
+        <Text style={styles.successTitle}>{t('encaisser.receipt.successTitle')}</Text>
         <Text style={styles.successAmount}>{formatFcfa(reçu?.montant ?? montant)}</Text>
 
         <Card style={styles.receiptCard}>
-          <Row label="Client" value={`${client?.prenom || ''} ${client?.nom || ''}`.trim() || '—'} />
-          <Row label="Référence" value={reçu?.reference || transaction?.reference || '—'} />
-          <Row label="Date & heure" value={formatDateTime(reçu?.date || transaction?.date_heure)} />
-          <Row label="Méthode" value="Scan de paiement AfriPay" last />
+          <Row label={t('encaisser.receipt.clientLabel')} value={`${client?.prenom || ''} ${client?.nom || ''}`.trim() || '—'} />
+          <Row label={t('encaisser.receipt.referenceLabel')} value={reçu?.reference || transaction?.reference || '—'} />
+          <Row label={t('encaisser.receipt.dateLabel')} value={formatDateTime(reçu?.date || transaction?.date_heure)} />
+          <Row label={t('encaisser.receipt.methodLabel')} value={t('encaisser.receipt.methodValue')} last />
         </Card>
 
-        <GradientButton title="Nouvel encaissement" onPress={() => navigation.replace('EncaisserAmount')} style={{ marginTop: 24 }} />
-        <GradientButton title="Retour au tableau de bord" onPress={goDashboard} variant="ghost" style={{ marginTop: 8 }} />
+        <GradientButton
+          title={t('encaisser.receipt.newTransaction')}
+          onPress={() => navigation.replace('EncaisserAmount')}
+          style={{ marginTop: 24 }}
+        />
+        <GradientButton
+          title={t('encaisser.receipt.backToDashboard')}
+          onPress={goDashboard}
+          variant="ghost"
+          style={{ marginTop: 8 }}
+        />
       </ScrollView>
     );
   }
@@ -45,16 +56,26 @@ export default function ReceiptScreen({ route, navigation }) {
       <View style={styles.checkWrap}>
         <Icon name="circle-xmark" size={88} color={colors.error} />
       </View>
-      <Text style={styles.failTitle}>Paiement refusé</Text>
+      <Text style={styles.failTitle}>{t('encaisser.receipt.failTitle')}</Text>
       <Text style={styles.failMessage}>{errorMessage}</Text>
 
       <Card style={styles.receiptCard}>
-        <Row label="Montant demandé" value={formatFcfa(montant)} last />
+        <Row label={t('encaisser.receipt.requestedAmountLabel')} value={formatFcfa(montant)} last />
       </Card>
 
-      <GradientButton title="Réessayer le scan" onPress={retry} style={{ marginTop: 24 }} />
-      <GradientButton title="Modifier le montant" onPress={() => navigation.replace('EncaisserAmount')} variant="secondary" style={{ marginTop: 12 }} />
-      <GradientButton title="Retour au tableau de bord" onPress={goDashboard} variant="ghost" style={{ marginTop: 8 }} />
+      <GradientButton title={t('encaisser.receipt.retry')} onPress={retry} style={{ marginTop: 24 }} />
+      <GradientButton
+        title={t('encaisser.receipt.changeAmount')}
+        onPress={() => navigation.replace('EncaisserAmount')}
+        variant="secondary"
+        style={{ marginTop: 12 }}
+      />
+      <GradientButton
+        title={t('encaisser.receipt.backToDashboard')}
+        onPress={goDashboard}
+        variant="ghost"
+        style={{ marginTop: 8 }}
+      />
     </ScrollView>
   );
 }

@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import BrandHeader from '../../components/BrandHeader';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
@@ -16,6 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import { extractErrorMessage } from '../../api/client';
 
 export default function LoginScreen({ navigation }) {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const [telephone, setTelephone] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
@@ -25,14 +27,14 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     setError('');
     if (!telephone || !motDePasse) {
-      setError('Veuillez renseigner votre téléphone et votre mot de passe.');
+      setError(t('auth.login.missingFields'));
       return;
     }
     setLoading(true);
     try {
       await login({ telephone, motDePasse });
     } catch (e) {
-      setError(extractErrorMessage(e, 'Connexion impossible. Vérifiez vos identifiants.'));
+      setError(extractErrorMessage(e, t('auth.login.error')));
     } finally {
       setLoading(false);
     }
@@ -48,20 +50,20 @@ export default function LoginScreen({ navigation }) {
           <BrandHeader size="main" showTagline />
         </View>
 
-        <Text style={styles.title}>Espace Marchand</Text>
-        <Text style={styles.subtitle}>Connectez-vous pour encaisser vos ventes AfriPay.</Text>
+        <Text style={styles.title}>{t('auth.login.title')}</Text>
+        <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
 
         <View style={styles.form}>
           <Input
-            label="Téléphone"
-            placeholder="Ex: 0700000000"
+            label={t('auth.login.phoneLabel')}
+            placeholder={t('auth.login.phonePlaceholder')}
             keyboardType="phone-pad"
             autoCapitalize="none"
             value={telephone}
             onChangeText={setTelephone}
           />
           <Input
-            label="Mot de passe"
+            label={t('auth.login.passwordLabel')}
             placeholder="••••••••"
             secureTextEntry
             autoCapitalize="none"
@@ -71,11 +73,11 @@ export default function LoginScreen({ navigation }) {
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-          <GradientButton title="Se connecter" onPress={handleLogin} loading={loading} style={styles.submitBtn} />
+          <GradientButton title={t('auth.login.submit')} onPress={handleLogin} loading={loading} style={styles.submitBtn} />
 
           <TouchableOpacity onPress={() => navigation.navigate('RegisterType')} style={styles.registerLink}>
             <Text style={styles.registerText}>
-              Pas encore de compte marchand ? <Text style={styles.registerTextStrong}>Créer un compte</Text>
+              {t('auth.login.noAccount')} <Text style={styles.registerTextStrong}>{t('auth.login.createAccount')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

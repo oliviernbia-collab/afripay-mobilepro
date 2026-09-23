@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Card from '../../components/Card';
@@ -15,6 +16,7 @@ const TYPE_ICONS = {
 };
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -26,9 +28,9 @@ export default function NotificationsScreen() {
       const data = await getNotifications({ limit: 50 });
       setItems(data);
     } catch (e) {
-      setError(extractErrorMessage(e, 'Impossible de charger les notifications.'));
+      setError(extractErrorMessage(e, t('notifications.loadError')));
     }
-  }, []);
+  }, [t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -59,7 +61,7 @@ export default function NotificationsScreen() {
     try {
       await markAllNotificationsRead();
     } catch (e) {
-      setError(extractErrorMessage(e, 'Impossible de marquer tout comme lu.'));
+      setError(extractErrorMessage(e, t('notifications.markAllError')));
     }
   };
 
@@ -68,10 +70,10 @@ export default function NotificationsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Notifications</Text>
+        <Text style={styles.title}>{t('notifications.title')}</Text>
         {hasUnread ? (
           <TouchableOpacity onPress={handleMarkAllRead}>
-            <Text style={styles.markAll}>Tout marquer lu</Text>
+            <Text style={styles.markAll}>{t('notifications.markAllRead')}</Text>
           </TouchableOpacity>
         ) : null}
       </View>
@@ -84,7 +86,7 @@ export default function NotificationsScreen() {
         ListEmptyComponent={
           !loading ? (
             <Card style={styles.emptyCard}>
-              <Text style={styles.emptyText}>{error || 'Aucune notification pour le moment.'}</Text>
+              <Text style={styles.emptyText}>{error || t('notifications.empty')}</Text>
             </Card>
           ) : null
         }

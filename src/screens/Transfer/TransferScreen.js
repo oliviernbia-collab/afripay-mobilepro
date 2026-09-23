@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Input from '../../components/Input';
@@ -26,12 +27,13 @@ const OPERATOR_META = {
 };
 
 export default function TransferScreen() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState('externe'); // 'externe' | 'interne'
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.header}>
-        <Text style={styles.title}>Transférer</Text>
+        <Text style={styles.title}>{t('transfer.title')}</Text>
       </View>
 
       <View style={styles.tabs}>
@@ -39,13 +41,13 @@ export default function TransferScreen() {
           style={[styles.tab, mode === 'externe' && styles.tabActive]}
           onPress={() => setMode('externe')}
         >
-          <Text style={[styles.tabText, mode === 'externe' && styles.tabTextActive]}>Vers Mobile Money</Text>
+          <Text style={[styles.tabText, mode === 'externe' && styles.tabTextActive]}>{t('transfer.tabExternal')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, mode === 'interne' && styles.tabActive]}
           onPress={() => setMode('interne')}
         >
-          <Text style={[styles.tabText, mode === 'interne' && styles.tabTextActive]}>Vers un compte AfriPay</Text>
+          <Text style={[styles.tabText, mode === 'interne' && styles.tabTextActive]}>{t('transfer.tabInternal')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -55,6 +57,7 @@ export default function TransferScreen() {
 }
 
 function ExternalTransferForm() {
+  const { t } = useTranslation();
   const [operateur, setOperateur] = useState(MOBILE_MONEY_OPERATORS[0].value);
   const [numero, setNumero] = useState('');
   const [montant, setMontant] = useState('');
@@ -70,11 +73,11 @@ function ExternalTransferForm() {
     setError('');
     setSuccess(null);
     if (!numero || !montantValue) {
-      setError('Renseignez le numéro de destination et le montant.');
+      setError(t('transfer.missingFieldsExternal'));
       return;
     }
     if (needsPin && !pin) {
-      setError(`Code PIN requis pour les transferts à partir de ${PIN_THRESHOLD.toLocaleString('fr-FR')} FCFA.`);
+      setError(t('transfer.pinRequired', { amount: PIN_THRESHOLD.toLocaleString('fr-FR') }));
       return;
     }
     setLoading(true);
@@ -90,7 +93,7 @@ function ExternalTransferForm() {
       setMontant('');
       setPin('');
     } catch (e) {
-      setError(extractErrorMessage(e, 'Le transfert a échoué.'));
+      setError(extractErrorMessage(e, t('transfer.genericError')));
     } finally {
       setLoading(false);
     }
@@ -98,7 +101,7 @@ function ExternalTransferForm() {
 
   return (
     <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-      <Text style={styles.label}>Opérateur</Text>
+      <Text style={styles.label}>{t('transfer.operatorLabel')}</Text>
       {MOBILE_MONEY_OPERATORS.map((op) => {
         const meta = OPERATOR_META[op.value] || { color: colors.turquoise, icon: 'wallet' };
         return (
@@ -106,7 +109,7 @@ function ExternalTransferForm() {
             key={op.value}
             icon={meta.icon}
             iconColor={meta.color}
-            label={op.label}
+            label={t(`providers.${op.value}`, { defaultValue: op.label })}
             selected={operateur === op.value}
             onPress={() => setOperateur(op.value)}
             showChevron={false}
@@ -115,21 +118,45 @@ function ExternalTransferForm() {
         );
       })}
 
-      <Input label="Numéro destinataire" placeholder="Ex: 0700000000" keyboardType="phone-pad" value={numero} onChangeText={setNumero} />
-      <Input label="Montant (FCFA)" placeholder="0" keyboardType="number-pad" value={montant} onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))} />
+      <Input
+        label={t('transfer.externalNumberLabel')}
+        placeholder={t('transfer.numberPlaceholder')}
+        keyboardType="phone-pad"
+        value={numero}
+        onChangeText={setNumero}
+      />
+      <Input
+        label={t('transfer.amountLabel')}
+        placeholder="0"
+        keyboardType="number-pad"
+        value={montant}
+        onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
+      />
       {needsPin ? (
-        <Input label="Code PIN AfriPay" placeholder="••••" secureTextEntry keyboardType="number-pad" value={pin} onChangeText={setPin} />
+        <Input
+          label={t('transfer.pinLabel')}
+          placeholder="••••"
+          secureTextEntry
+          keyboardType="number-pad"
+          value={pin}
+          onChangeText={setPin}
+        />
       ) : null}
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      {success ? <Text style={styles.successText}>Transfert envoyé avec succès vers {operateur}.</Text> : null}
+      {success ? (
+        <Text style={styles.successText}>
+          {t('transfer.successExternal', { operator: t(`providers.${operateur}`, { defaultValue: operateur }) })}
+        </Text>
+      ) : null}
 
-      <GradientButton title="Envoyer" onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
+      <GradientButton title={t('transfer.submit')} onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
     </ScrollView>
   );
 }
 
 function InternalTransferForm() {
+  const { t } = useTranslation();
   const [telephone, setTelephone] = useState('');
   const [montant, setMontant] = useState('');
   const [libelle, setLibelle] = useState('');
@@ -145,11 +172,11 @@ function InternalTransferForm() {
     setError('');
     setSuccess(null);
     if (!telephone || !montantValue) {
-      setError('Renseignez le numéro du destinataire et le montant.');
+      setError(t('transfer.missingFieldsInternal'));
       return;
     }
     if (needsPin && !pin) {
-      setError(`Code PIN requis pour les transferts à partir de ${PIN_THRESHOLD.toLocaleString('fr-FR')} FCFA.`);
+      setError(t('transfer.pinRequired', { amount: PIN_THRESHOLD.toLocaleString('fr-FR') }));
       return;
     }
     setLoading(true);
@@ -166,7 +193,7 @@ function InternalTransferForm() {
       setLibelle('');
       setPin('');
     } catch (e) {
-      setError(extractErrorMessage(e, 'Le transfert a échoué.'));
+      setError(extractErrorMessage(e, t('transfer.genericError')));
     } finally {
       setLoading(false);
     }
@@ -174,17 +201,41 @@ function InternalTransferForm() {
 
   return (
     <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-      <Input label="Téléphone du destinataire" placeholder="Ex: 0700000000" keyboardType="phone-pad" value={telephone} onChangeText={setTelephone} />
-      <Input label="Montant (FCFA)" placeholder="0" keyboardType="number-pad" value={montant} onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))} />
-      <Input label="Note (optionnel)" placeholder="Motif du transfert" value={libelle} onChangeText={setLibelle} />
+      <Input
+        label={t('transfer.internalNumberLabel')}
+        placeholder={t('transfer.numberPlaceholder')}
+        keyboardType="phone-pad"
+        value={telephone}
+        onChangeText={setTelephone}
+      />
+      <Input
+        label={t('transfer.amountLabel')}
+        placeholder="0"
+        keyboardType="number-pad"
+        value={montant}
+        onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
+      />
+      <Input
+        label={t('transfer.noteLabel')}
+        placeholder={t('transfer.notePlaceholder')}
+        value={libelle}
+        onChangeText={setLibelle}
+      />
       {needsPin ? (
-        <Input label="Code PIN AfriPay" placeholder="••••" secureTextEntry keyboardType="number-pad" value={pin} onChangeText={setPin} />
+        <Input
+          label={t('transfer.pinLabel')}
+          placeholder="••••"
+          secureTextEntry
+          keyboardType="number-pad"
+          value={pin}
+          onChangeText={setPin}
+        />
       ) : null}
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      {success ? <Text style={styles.successText}>Transfert AfriPay effectué avec succès.</Text> : null}
+      {success ? <Text style={styles.successText}>{t('transfer.successInternal')}</Text> : null}
 
-      <GradientButton title="Envoyer" onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
+      <GradientButton title={t('transfer.submit')} onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
     </ScrollView>
   );
 }

@@ -1,40 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Share } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { radii } from '../../theme/colors';
 import Card from '../../components/Card';
 import { KybBadge } from '../../components/StatusBadge';
 import { useAuth } from '../../context/AuthContext';
 
-const FAQ = [
-  {
-    q: "Quand puis-je commencer à encaisser des paiements ?",
-    a: "Dès que votre dossier KYB est validé par un agent AfriPay depuis le back office. Suivez le statut dans la section 'Validation du compte'.",
-  },
-  {
-    q: 'Comment fonctionne le scan de paiement ?',
-    a: "Le client affiche un QR code sur son application AfriPay (écran « Payer »). Vous scannez ce code avec la caméra pour encaisser le montant — il remplace la reconnaissance de paume de main réelle dans cette version.",
-  },
-  {
-    q: "Le code PIN est-il obligatoire ?",
-    a: "Il est requis uniquement pour confirmer les transferts (Mobile Money ou compte AfriPay) d'un montant supérieur ou égal à 50 000 FCFA.",
-  },
-];
-
 export default function SettingsScreen({ navigation }) {
+  const { t } = useTranslation();
   const { merchant, logout } = useAuth();
-  const [openFaq, setOpenFaq] = useState(null);
 
   const handleLogout = () => {
-    Alert.alert('Déconnexion', 'Voulez-vous vraiment vous déconnecter ?', [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Déconnexion', style: 'destructive', onPress: logout },
+    Alert.alert(t('settings.logoutConfirmTitle'), t('settings.logoutConfirmText'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('settings.logout'), style: 'destructive', onPress: logout },
     ]);
+  };
+
+  const onShareApp = () => {
+    Share.share({ message: t('about.shareMessage') });
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Paramètres</Text>
+      <Text style={styles.title}>{t('settings.title')}</Text>
 
       <Card style={styles.profileCard}>
         <View style={styles.profileHeader}>
@@ -42,39 +32,38 @@ export default function SettingsScreen({ navigation }) {
             <Icon name="store" size={26} color={colors.text} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.profileName}>{merchant?.raison_sociale || 'Marchand AfriPay'}</Text>
+            <Text style={styles.profileName}>{merchant?.raison_sociale || t('settings.defaultMerchantName')}</Text>
             <Text style={styles.profilePhone}>{merchant?.telephone}</Text>
           </View>
           <KybBadge statut={merchant?.statut_kyb} />
         </View>
         <View style={styles.profileDetails}>
-          <DetailRow label="Type de compte" value={merchant?.type === 'entreprise' ? 'Entreprise' : 'Particulier'} />
-          {merchant?.email ? <DetailRow label="Email" value={merchant.email} /> : null}
-          {merchant?.rccm ? <DetailRow label="RCCM" value={merchant.rccm} /> : null}
-          {merchant?.ncc ? <DetailRow label="NCC / NIF" value={merchant.ncc} /> : null}
+          <DetailRow
+            label={t('settings.typeLabel')}
+            value={merchant?.type === 'entreprise' ? t('settings.typeEntreprise') : t('settings.typeParticulier')}
+          />
+          {merchant?.email ? <DetailRow label={t('settings.emailLabel')} value={merchant.email} /> : null}
+          {merchant?.rccm ? <DetailRow label={t('settings.rccmLabel')} value={merchant.rccm} /> : null}
+          {merchant?.ncc ? <DetailRow label={t('settings.nccLabel')} value={merchant.ncc} /> : null}
         </View>
       </Card>
 
-      <Text style={styles.sectionTitle}>Compte</Text>
-      <MenuItem icon="shield-halved" label="Validation du compte (KYB)" onPress={() => navigation.navigate('Kyb')} />
-      <MenuItem icon="key" label="Changer mon code PIN" onPress={() => navigation.navigate('ChangePin')} />
+      <Text style={styles.sectionTitle}>{t('settings.sectionAccount')}</Text>
+      <MenuItem icon="shield-halved" label={t('settings.kybMenu')} onPress={() => navigation.navigate('Kyb')} />
+      <MenuItem icon="key" label={t('settings.pinMenu')} onPress={() => navigation.navigate('ChangePin')} />
 
-      <Text style={styles.sectionTitle}>Aide</Text>
-      {FAQ.map((item, index) => (
-        <TouchableOpacity key={item.q} onPress={() => setOpenFaq(openFaq === index ? null : index)} activeOpacity={0.8}>
-          <Card style={styles.faqCard}>
-            <View style={styles.faqHeader}>
-              <Text style={styles.faqQuestion}>{item.q}</Text>
-              <Icon name={openFaq === index ? 'chevron-up' : 'chevron-down'} size={18} color={colors.textMuted} />
-            </View>
-            {openFaq === index ? <Text style={styles.faqAnswer}>{item.a}</Text> : null}
-          </Card>
-        </TouchableOpacity>
-      ))}
+      <Text style={styles.sectionTitle}>{t('settings.sectionHelp')}</Text>
+      <MenuItem icon="circle-question" label={t('settings.helpMenu')} onPress={() => navigation.navigate('Support')} />
+      <MenuItem icon="share-nodes" label={t('settings.shareApp')} onPress={onShareApp} />
+
+      <Text style={styles.sectionTitle}>{t('settings.sectionLegal')}</Text>
+      <MenuItem icon="file-contract" label={t('settings.termsMenu')} onPress={() => navigation.navigate('Terms')} />
+      <MenuItem icon="user-shield" label={t('settings.privacyMenu')} onPress={() => navigation.navigate('Privacy')} />
+      <MenuItem icon="circle-info" label={t('about.title')} onPress={() => navigation.navigate('About')} />
 
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Icon name="right-from-bracket" size={20} color={colors.error} />
-        <Text style={styles.logoutText}>Se déconnecter</Text>
+        <Text style={styles.logoutText}>{t('settings.logout')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -127,10 +116,6 @@ const styles = StyleSheet.create({
   menuCard: { marginBottom: 10 },
   menuRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   menuLabel: { flex: 1, color: colors.text, fontSize: 14, fontWeight: '600' },
-  faqCard: { marginBottom: 10 },
-  faqHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  faqQuestion: { flex: 1, color: colors.text, fontSize: 13, fontWeight: '600', marginRight: 8 },
-  faqAnswer: { color: colors.textSecondary, fontSize: 12.5, marginTop: 10, lineHeight: 18 },
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -45,7 +45,9 @@
           "photosPermission": "AfriPay Pro a besoin d'accéder à vos photos pour envoyer vos documents KYB."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-localization",
+      "expo-sharing"
     ]
   }
 }

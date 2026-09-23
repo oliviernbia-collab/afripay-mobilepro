@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
 import Icon from '../components/Icon';
 import colors from '../theme/colors';
 
@@ -19,7 +20,11 @@ const ICONS = {
   Parametres: 'gear',
 };
 
+// Route names stay fixed French keys (used throughout for navigation.navigate calls) —
+// only the visible tabBarLabel is translated here.
 export default function MainTabNavigator() {
+  const { t } = useTranslation();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -39,11 +44,19 @@ export default function MainTabNavigator() {
         ),
       })}
     >
-      <Tab.Screen name="Accueil" component={DashboardScreen} />
-      <Tab.Screen name="Transferer" component={TransferScreen} options={{ title: 'Transférer' }} />
-      <Tab.Screen name="Historique" component={HistoriqueScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} />
-      <Tab.Screen name="Parametres" component={SettingsScreen} options={{ title: 'Paramètres' }} />
+      <Tab.Screen name="Accueil" component={DashboardScreen} options={{ tabBarLabel: t('nav.accueil') }} />
+      <Tab.Screen
+        name="Transferer"
+        component={TransferScreen}
+        options={{ tabBarLabel: t('nav.transferer'), title: t('nav.transferer') }}
+      />
+      <Tab.Screen name="Historique" component={HistoriqueScreen} options={{ tabBarLabel: t('nav.historique') }} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarLabel: t('nav.notifications') }} />
+      <Tab.Screen
+        name="Parametres"
+        component={SettingsScreen}
+        options={{ tabBarLabel: t('nav.parametres'), title: t('nav.parametres') }}
+      />
     </Tab.Navigator>
   );
 }

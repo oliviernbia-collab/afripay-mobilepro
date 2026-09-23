@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
 import colors, { radii } from '../../theme/colors';
@@ -8,6 +9,7 @@ import { requestMerchantOtp } from '../../api/auth';
 import { extractErrorMessage } from '../../api/client';
 
 export default function OtpScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { devCode, registerPayload } = route.params;
   const { register } = useAuth();
 
@@ -20,7 +22,7 @@ export default function OtpScreen({ route, navigation }) {
   const handleVerify = async () => {
     setError('');
     if (!otp) {
-      setError('Veuillez saisir le code reçu par SMS.');
+      setError(t('auth.otp.missingCode'));
       return;
     }
     setLoading(true);
@@ -28,7 +30,7 @@ export default function OtpScreen({ route, navigation }) {
       await register({ ...registerPayload, otp });
       navigation.reset({ index: 0, routes: [{ name: 'SetPin' }] });
     } catch (e) {
-      setError(extractErrorMessage(e, 'Code invalide ou expiré.'));
+      setError(extractErrorMessage(e, t('auth.otp.invalidCode')));
     } finally {
       setLoading(false);
     }
@@ -42,7 +44,7 @@ export default function OtpScreen({ route, navigation }) {
       setCurrentDevCode(result.devCode);
       if (result.devCode) setOtp(result.devCode);
     } catch (e) {
-      setError(extractErrorMessage(e, "Impossible de renvoyer le code."));
+      setError(extractErrorMessage(e, t('auth.otp.resendError')));
     } finally {
       setResending(false);
     }
@@ -50,22 +52,18 @@ export default function OtpScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Vérification du numéro</Text>
-      <Text style={styles.subtitle}>
-        Un code à usage unique a été envoyé au {registerPayload.telephone}.
-      </Text>
+      <Text style={styles.title}>{t('auth.otp.title')}</Text>
+      <Text style={styles.subtitle}>{t('auth.otp.subtitle', { phone: registerPayload.telephone })}</Text>
 
       {currentDevCode ? (
         <View style={styles.devBanner}>
-          <Text style={styles.devBannerTitle}>Mode développement</Text>
-          <Text style={styles.devBannerText}>
-            Le serveur API renvoie le code directement (pas de vrai SMS envoyé) : {currentDevCode}
-          </Text>
+          <Text style={styles.devBannerTitle}>{t('auth.otp.devTitle')}</Text>
+          <Text style={styles.devBannerText}>{t('auth.otp.devText', { code: currentDevCode })}</Text>
         </View>
       ) : null}
 
       <Input
-        label="Code de vérification"
+        label={t('auth.otp.codeLabel')}
         placeholder="123456"
         keyboardType="number-pad"
         value={otp}
@@ -74,9 +72,9 @@ export default function OtpScreen({ route, navigation }) {
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <GradientButton title="Vérifier et créer le compte" onPress={handleVerify} loading={loading} />
+      <GradientButton title={t('auth.otp.verify')} onPress={handleVerify} loading={loading} />
       <GradientButton
-        title="Renvoyer le code"
+        title={t('auth.otp.resend')}
         onPress={handleResend}
         loading={resending}
         variant="ghost"

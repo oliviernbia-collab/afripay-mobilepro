@@ -24,4 +24,16 @@ const HOSTS = {
 // instead of a physical device.
 export const API_BASE_URL = HOSTS.device;
 
+// Used to build absolute URLs for legacy files served under /uploads/<file>
+export const SERVER_ORIGIN = API_BASE_URL.replace(/\/api$/, '');
+
+// Photos / documents (KYB, etc.) are stored on Cloudinary and come back as
+// absolute https:// URLs. Older records may still hold a relative
+// "/uploads/<file>" path, so only prefix with SERVER_ORIGIN when the value
+// isn't already absolute.
+export function resolveMediaUrl(url) {
+  if (!url) return url;
+  return /^https?:\/\//i.test(url) ? url : `${SERVER_ORIGIN}${url}`;
+}
+
 export default API_BASE_URL;
