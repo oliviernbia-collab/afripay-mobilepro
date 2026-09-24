@@ -9,11 +9,15 @@ import { setMerchantPin } from '../../api/auth';
 import { extractErrorMessage } from '../../api/client';
 
 const PIN_LENGTH = 4;
-const STAGES = ['enter', 'confirm'];
+// Le backend exige désormais le PIN actuel pour en définir un nouveau (POST /auth/marchand/pin
+// refuse sans `pinActuel` dès qu'un PIN existe déjà) — sans quoi une session volée (token encore
+// valide) suffirait à remplacer le PIN sans le connaître.
+const STAGES = ['current', 'enter', 'confirm'];
 
 export default function ChangePinScreen({ navigation }) {
   const { t } = useTranslation();
-  const [stage, setStage] = useState('enter'); // 'enter' | 'confirm'
+  const [stage, setStage] = useState('current'); // 'current' | 'enter' | 'confirm'
+  const [currentPin, setCurrentPin] = useState('');
   const [firstPin, setFirstPin] = useState('');
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,12 +29,13 @@ export default function ChangePinScreen({ navigation }) {
   const submit = async (confirmedPin) => {
     setLoading(true);
     try {
-      await setMerchantPin(confirmedPin);
+      await setMerchantPin(confirmedPin, currentPin);
       setSuccess(true);
       setTimeout(() => navigation.goBack(), 900);
     } catch (e) {
       setError(extractErrorMessage(e, t('changePin.saveError')));
-      setStage('enter');
+      setStage('current');
+      setCurrentPin('');
       setFirstPin('');
       setPin('');
     } finally {
@@ -44,7 +49,13 @@ export default function ChangePinScreen({ navigation }) {
     const next = pin + d;
     setPin(next);
     if (next.length === PIN_LENGTH) {
-      if (stage === 'enter') {
+      if (stage === 'current') {
+        setTimeout(() => {
+          setCurrentPin(next);
+          setStage('enter');
+          setPin('');
+        }, 150);
+      } else if (stage === 'enter') {
         setTimeout(() => {
           setFirstPin(next);
           setStage('confirm');
@@ -81,9 +92,15 @@ export default function ChangePinScreen({ navigation }) {
       </View>
       <Text style={styles.progressLabel}>{t('changePin.stepLabel', { current: stepIndex + 1, total: STAGES.length })}</Text>
 
-      <Text style={styles.title}>{stage === 'enter' ? t('changePin.titleNew') : t('changePin.titleConfirm')}</Text>
+      <Text style={styles.title}>
+        {stage === 'current' ? t('changePin.titleCurrent') : stage === 'enter' ? t('changePin.titleNew') : t('changePin.titleConfirm')}
+      </Text>
       <Text style={styles.subtitle}>
-        {stage === 'enter' ? t('changePin.subtitleCreate') : t('changePin.subtitleConfirm')}
+        {stage === 'current'
+          ? t('changePin.subtitleCurrent')
+          : stage === 'enter'
+          ? t('changePin.subtitleCreate')
+          : t('changePin.subtitleConfirm')}
       </Text>
 
       {error ? (

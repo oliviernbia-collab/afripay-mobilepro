@@ -190,7 +190,10 @@
       "amountLabel": "Montant à encaisser",
       "verifying": "Vérification du paiement…",
       "instructions": "Placez le QR code affiché sur l'écran \"Payer\" du client dans le cadre.",
-      "paymentFailed": "Le paiement a échoué."
+      "paymentFailed": "Le paiement a échoué.",
+      "clientPinTitle": "Code PIN du client requis",
+      "clientPinSubtitle": "Ce montant nécessite une confirmation. Faites saisir au client son code PIN AfriPay.",
+      "clientPinCancel": "Annuler"
     },
     "receipt": {
       "successTitle": "Paiement accepté",
@@ -204,7 +207,8 @@
       "newTransaction": "Nouvel encaissement",
       "backToDashboard": "Retour au tableau de bord",
       "retry": "Réessayer le scan",
-      "changeAmount": "Modifier le montant"
+      "changeAmount": "Modifier le montant",
+      "insufficientBalanceHint": "Proposez au client un moyen de paiement alternatif (espèces, Mobile Money direct)."
     }
   },
   "historique": {
@@ -297,9 +301,11 @@
   },
   "changePin": {
     "stepLabel": "Étape {{current}} sur {{total}}",
+    "titleCurrent": "Code PIN actuel",
     "titleNew": "Nouveau code PIN",
     "titleConfirm": "Confirmez votre code PIN",
-    "subtitleCreate": "Ce code à 4 chiffres est demandé pour confirmer les transferts à partir de 50 000 FCFA.",
+    "subtitleCurrent": "Saisissez votre code PIN actuel pour continuer.",
+    "subtitleCreate": "Ce code à 4 chiffres est demandé pour confirmer chaque transfert et les paiements au-delà d'un certain montant.",
     "subtitleConfirm": "Saisissez à nouveau le même code pour le confirmer.",
     "mismatchError": "Les codes PIN ne correspondent pas. Recommencez.",
     "saveError": "Impossible de mettre à jour le code PIN.",
@@ -352,7 +358,7 @@
     "submit": "Envoyer",
     "missingFieldsExternal": "Renseignez le numéro de destination et le montant.",
     "missingFieldsInternal": "Renseignez le numéro du destinataire et le montant.",
-    "pinRequired": "Code PIN requis pour les transferts à partir de {{amount}} FCFA.",
+    "pinRequired": "Votre code PIN AfriPay (4 à 6 chiffres) est requis.",
     "successExternal": "Transfert envoyé avec succès vers {{operator}}.",
     "successInternal": "Transfert AfriPay effectué avec succès.",
     "genericError": "Le transfert a échoué."

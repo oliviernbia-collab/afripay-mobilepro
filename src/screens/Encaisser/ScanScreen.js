@@ -7,9 +7,13 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import colors, { gradients } from '../../theme/colors';
 import GradientButton from '../../components/GradientButton';
+import PinDots from '../../components/PinDots';
+import PinKeypad from '../../components/PinKeypad';
 import { formatFcfa } from '../../utils/format';
 import { encaisser } from '../../api/marchand';
 import { extractErrorMessage } from '../../api/client';
+
+const PIN_LENGTH = 4;
 
 export default function ScanScreen({ route, navigation }) {
   const { t } = useTranslation();
@@ -17,7 +21,16 @@ export default function ScanScreen({ route, navigation }) {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanning, setScanning] = useState(true);
   const [processing, setProcessing] = useState(false);
+  // Au-delà d'un certain montant, le backend exige une confirmation par PIN CLIENT (cahier des
+  // charges 4.3 pt.12) — comme un code PIN saisi sur un TPE physique. Plutôt que de dupliquer ce
+  // seuil ici, on tente d'abord sans PIN et on ne bascule sur ce clavier que si le serveur le
+  // demande explicitement (réponse 400 "Code PIN requis...") : le seuil reste une seule source de
+  // vérité, côté backend.
+  const [needsClientPin, setNeedsClientPin] = useState(false);
+  const [clientPin, setClientPin] = useState('');
+  const [pinError, setPinError] = useState('');
   const scannedRef = useRef(false);
+  const palmCodeRef = useRef(null);
 
   // Reset the scan lock whenever this screen regains focus (e.g. after "Réessayer").
   useFocusEffect(
@@ -25,26 +38,90 @@ export default function ScanScreen({ route, navigation }) {
       scannedRef.current = false;
       setScanning(true);
       setProcessing(false);
+      setNeedsClientPin(false);
+      setClientPin('');
+      setPinError('');
     }, [])
   );
 
-  const handleBarcodeScanned = async ({ data }) => {
+  const attemptEncaisser = async (palmCode, pin) => {
+    setProcessing(true);
+    try {
+      const result = await encaisser({ montant, palmCode, clientPin: pin });
+      navigation.replace('EncaisserReceipt', { success: true, montant, result });
+    } catch (e) {
+      const status = e?.response?.status;
+      const message = extractErrorMessage(e, t('encaisser.scan.paymentFailed'));
+      if (status === 400 && !pin && /code pin/i.test(message)) {
+        // Le serveur demande une confirmation PIN pour ce montant : on garde le palmCode déjà
+        // identifié et on bascule sur le clavier PIN plutôt que de re-scanner.
+        palmCodeRef.current = palmCode;
+        setNeedsClientPin(true);
+        setProcessing(false);
+        return;
+      }
+      if (pin) {
+        // PIN client incorrect (ou verrouillage anti brute-force) : on reste sur le clavier PIN
+        // pour laisser une nouvelle tentative, plutôt que de renvoyer au scan.
+        setPinError(message);
+        setClientPin('');
+        setProcessing(false);
+        return;
+      }
+      navigation.replace('EncaisserReceipt', { success: false, montant, errorMessage: message });
+    }
+  };
+
+  const handleBarcodeScanned = ({ data }) => {
     if (scannedRef.current || processing) return;
     scannedRef.current = true;
     setScanning(false);
-    setProcessing(true);
+    attemptEncaisser(data, undefined);
+  };
 
-    try {
-      const result = await encaisser({ montant, palmCode: data });
-      navigation.replace('EncaisserReceipt', { success: true, montant, result });
-    } catch (e) {
-      navigation.replace('EncaisserReceipt', {
-        success: false,
-        montant,
-        errorMessage: extractErrorMessage(e, t('encaisser.scan.paymentFailed')),
-      });
+  const onPinDigit = (d) => {
+    if (processing || clientPin.length >= PIN_LENGTH) return;
+    setPinError('');
+    const next = clientPin + d;
+    setClientPin(next);
+    if (next.length === PIN_LENGTH) {
+      attemptEncaisser(palmCodeRef.current, next);
     }
   };
+
+  const onPinBackspace = () => {
+    if (processing) return;
+    setClientPin((p) => p.slice(0, -1));
+  };
+
+  if (needsClientPin) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.amountBar}>
+          <Text style={styles.amountLabel}>{t('encaisser.scan.amountLabel')}</Text>
+          <Text style={styles.amountValue}>{formatFcfa(montant)}</Text>
+        </View>
+        <View style={styles.pinContainer}>
+          <Icon name="shield-halved" size={40} color={colors.magenta} />
+          <Text style={styles.pinTitle}>{t('encaisser.scan.clientPinTitle')}</Text>
+          <Text style={styles.pinSubtitle}>{t('encaisser.scan.clientPinSubtitle')}</Text>
+          {pinError ? <Text style={styles.errorTextPin}>{pinError}</Text> : null}
+          <PinDots length={clientPin.length} minSlots={PIN_LENGTH} />
+          {processing ? (
+            <ActivityIndicator color={colors.magenta} style={{ marginTop: 20 }} />
+          ) : (
+            <PinKeypad onDigit={onPinDigit} onBackspace={onPinBackspace} disabled={processing} />
+          )}
+          <GradientButton
+            title={t('encaisser.scan.clientPinCancel')}
+            variant="ghost"
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: 16 }}
+          />
+        </View>
+      </View>
+    );
+  }
 
   if (!permission) {
     return (
@@ -132,6 +209,10 @@ const styles = StyleSheet.create({
   },
   amountLabel: { color: colors.textMuted, fontSize: 12 },
   amountValue: { color: colors.text, fontSize: 20, fontWeight: '800', marginTop: 2 },
+  pinContainer: { flex: 1, alignItems: 'center', paddingHorizontal: 24, paddingTop: 32 },
+  pinTitle: { color: colors.text, fontSize: 18, fontWeight: '700', marginTop: 14, textAlign: 'center' },
+  pinSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 8, textAlign: 'center', lineHeight: 19 },
+  errorTextPin: { color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
   cameraWrap: {
     flex: 1,
     overflow: 'hidden',

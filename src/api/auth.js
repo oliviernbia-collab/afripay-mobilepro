@@ -15,8 +15,8 @@ export async function loginMerchant({ telephone, motDePasse }) {
   return data.data; // { merchant, accessToken, refreshToken }
 }
 
-export async function setMerchantPin(pin) {
-  const { data } = await api.post('/auth/marchand/pin', { pin });
+export async function setMerchantPin(pin, pinActuel) {
+  const { data } = await api.post('/auth/marchand/pin', { pin, pinActuel });
   return data.data; // { updated }
 }
 

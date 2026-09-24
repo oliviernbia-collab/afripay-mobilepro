@@ -7,6 +7,13 @@ import Card from '../../components/Card';
 import GradientButton from '../../components/GradientButton';
 import { formatFcfa, formatDateTime } from '../../utils/format';
 
+// Détecte le refus pour solde insuffisant (message backend : "Solde du client insuffisant pour
+// couvrir ce montant") afin de suggérer un moyen de paiement alternatif — le cahier des charges
+// (6.3, point 19) demande explicitement cette proposition, hors périmètre AfriPay.
+function isInsufficientBalance(message) {
+  return /solde .* insuffisant/i.test(message || '');
+}
+
 export default function ReceiptScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { success, montant, result, errorMessage } = route.params;
@@ -30,7 +37,9 @@ export default function ReceiptScreen({ route, navigation }) {
         <Text style={styles.successAmount}>{formatFcfa(reçu?.montant ?? montant)}</Text>
 
         <Card style={styles.receiptCard}>
-          <Row label={t('encaisser.receipt.clientLabel')} value={`${client?.prenom || ''} ${client?.nom || ''}`.trim() || '—'} />
+          {/* client.nom est déjà anonymisé côté serveur (initiales, ex. "A. D.") — cahier des
+              charges 6.5 : jamais le nom complet du client affiché au marchand. */}
+          <Row label={t('encaisser.receipt.clientLabel')} value={client?.nom || '—'} />
           <Row label={t('encaisser.receipt.referenceLabel')} value={reçu?.reference || transaction?.reference || '—'} />
           <Row label={t('encaisser.receipt.dateLabel')} value={formatDateTime(reçu?.date || transaction?.date_heure)} />
           <Row label={t('encaisser.receipt.methodLabel')} value={t('encaisser.receipt.methodValue')} last />
@@ -58,6 +67,9 @@ export default function ReceiptScreen({ route, navigation }) {
       </View>
       <Text style={styles.failTitle}>{t('encaisser.receipt.failTitle')}</Text>
       <Text style={styles.failMessage}>{errorMessage}</Text>
+      {isInsufficientBalance(errorMessage) ? (
+        <Text style={styles.alternativeHint}>{t('encaisser.receipt.insufficientBalanceHint')}</Text>
+      ) : null}
 
       <Card style={styles.receiptCard}>
         <Row label={t('encaisser.receipt.requestedAmountLabel')} value={formatFcfa(montant)} last />
@@ -103,6 +115,7 @@ const styles = StyleSheet.create({
   successAmount: { color: colors.text, fontSize: 30, fontWeight: '800', marginTop: 6 },
   failTitle: { color: colors.error, fontSize: 20, fontWeight: '800' },
   failMessage: { color: colors.textSecondary, fontSize: 14, textAlign: 'center', marginTop: 8, lineHeight: 20 },
+  alternativeHint: { color: colors.textMuted, fontSize: 12.5, textAlign: 'center', marginTop: 10, lineHeight: 18 },
   receiptCard: { width: '100%', marginTop: 24 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10 },
   rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },

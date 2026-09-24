@@ -190,7 +190,10 @@
       "amountLabel": "Amount to collect",
       "verifying": "Verifying payment…",
       "instructions": "Place the QR code shown on the customer's \"Pay\" screen inside the frame.",
-      "paymentFailed": "The payment failed."
+      "paymentFailed": "The payment failed.",
+      "clientPinTitle": "Client PIN required",
+      "clientPinSubtitle": "This amount requires confirmation. Have the client enter their AfriPay PIN.",
+      "clientPinCancel": "Cancel"
     },
     "receipt": {
       "successTitle": "Payment accepted",
@@ -204,7 +207,8 @@
       "newTransaction": "New collection",
       "backToDashboard": "Back to dashboard",
       "retry": "Retry scan",
-      "changeAmount": "Change amount"
+      "changeAmount": "Change amount",
+      "insufficientBalanceHint": "Suggest an alternative payment method to the client (cash, direct Mobile Money)."
     }
   },
   "historique": {
@@ -297,9 +301,11 @@
   },
   "changePin": {
     "stepLabel": "Step {{current}} of {{total}}",
+    "titleCurrent": "Current PIN code",
     "titleNew": "New PIN code",
     "titleConfirm": "Confirm your PIN code",
-    "subtitleCreate": "This 4-digit code is requested to confirm transfers of 50,000 FCFA or more.",
+    "subtitleCurrent": "Enter your current PIN code to continue.",
+    "subtitleCreate": "This 4-digit code is requested to confirm every transfer and payments above a certain amount.",
     "subtitleConfirm": "Enter the same code again to confirm it.",
     "mismatchError": "The PIN codes don't match. Try again.",
     "saveError": "Unable to update the PIN code.",
@@ -352,7 +358,7 @@
     "submit": "Send",
     "missingFieldsExternal": "Enter the destination number and amount.",
     "missingFieldsInternal": "Enter the recipient's number and amount.",
-    "pinRequired": "PIN code required for transfers of {{amount}} FCFA or more.",
+    "pinRequired": "Your AfriPay PIN (4 to 6 digits) is required.",
     "successExternal": "Transfer successfully sent to {{operator}}.",
     "successInternal": "AfriPay transfer completed successfully.",
     "genericError": "The transfer failed."

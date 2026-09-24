@@ -19,6 +19,9 @@ main), gestion du portefeuille, transferts, historique et onboarding KYB.
    (l'IP LAN de la machine de développement). Si votre PC a une IP différente sur le réseau Wi-Fi
    (trouvable avec `ipconfig`), modifiez `DEVICE_LAN_IP` dans ce fichier. Le fichier documente aussi
    les valeurs à utiliser pour un émulateur Android (`10.0.2.2`) ou un simulateur iOS (`localhost`).
+   **Build de production** (EAS Build) : ces réglages ne s'appliquent qu'en développement — définissez
+   `EXPO_PUBLIC_API_URL` (voir `.env.example`) avec une URL **https://**, sinon le démarrage échoue
+   volontairement plutôt que de faire transiter PIN/mot de passe/tokens en clair sur le réseau.
 4. Démarrer le serveur de développement Expo :
    ```bash
    npx expo start

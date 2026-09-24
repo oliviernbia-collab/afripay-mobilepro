@@ -20,9 +20,21 @@ const HOSTS = {
   iosSimulator: 'http://localhost:4000/api',
 };
 
-// Default target — change this line if you're on an emulator/simulator
-// instead of a physical device.
-export const API_BASE_URL = HOSTS.device;
+// En build de production (__DEV__ === false), l'URL de l'API doit venir de EXPO_PUBLIC_API_URL
+// (définie au build, ex. via eas.json) et être en HTTPS — jamais l'IP locale de développement en
+// clair, qui exposerait PIN, mot de passe et tokens sur le réseau (Wi-Fi public/partagé, marché,
+// boutique). Le démarrage échoue volontairement si ce n'est pas configuré, plutôt que de se
+// rabattre silencieusement sur du HTTP.
+const PROD_API_URL = process.env.EXPO_PUBLIC_API_URL;
+if (!__DEV__ && (!PROD_API_URL || !PROD_API_URL.startsWith('https://'))) {
+  throw new Error(
+    'EXPO_PUBLIC_API_URL doit être défini avec une URL https:// pour un build de production (voir src/config/api.js).'
+  );
+}
+
+// Default target — change this line if you're on an emulator/simulator instead of a physical
+// device (uniquement en développement : __DEV__ est toujours vrai dans Expo Go / dev client).
+export const API_BASE_URL = __DEV__ ? HOSTS.device : `${PROD_API_URL.replace(/\/$/, '')}/api`;
 
 // Used to build absolute URLs for legacy files served under /uploads/<file>
 export const SERVER_ORIGIN = API_BASE_URL.replace(/\/api$/, '');

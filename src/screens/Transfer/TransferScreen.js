@@ -17,8 +17,6 @@ import IconRow from '../../components/IconRow';
 import { transferInterne, transferExterne, MOBILE_MONEY_OPERATORS } from '../../api/transferts';
 import { extractErrorMessage } from '../../api/client';
 
-const PIN_THRESHOLD = 50000;
-
 const OPERATOR_META = {
   wave: { color: '#1DC8E3', icon: 'droplet' },
   orange_money: { color: colors.orange, icon: 'mobile-screen' },
@@ -67,7 +65,6 @@ function ExternalTransferForm() {
   const [success, setSuccess] = useState(null);
 
   const montantValue = Number(montant || 0);
-  const needsPin = montantValue >= PIN_THRESHOLD;
 
   const handleSubmit = async () => {
     setError('');
@@ -76,8 +73,10 @@ function ExternalTransferForm() {
       setError(t('transfer.missingFieldsExternal'));
       return;
     }
-    if (needsPin && !pin) {
-      setError(t('transfer.pinRequired', { amount: PIN_THRESHOLD.toLocaleString('fr-FR') }));
+    // Le PIN AfriPay confirme désormais systématiquement tout transfert (le backend le rejette
+    // sans lui, quel que soit le montant) — ce n'est plus conditionné à un seuil.
+    if (!pin) {
+      setError(t('transfer.pinRequired'));
       return;
     }
     setLoading(true);
@@ -86,7 +85,7 @@ function ExternalTransferForm() {
         operateurDestination: operateur,
         numeroDestinataire: numero,
         montant: montantValue,
-        pin: needsPin ? pin : undefined,
+        pin,
       });
       setSuccess(result);
       setNumero('');
@@ -132,16 +131,14 @@ function ExternalTransferForm() {
         value={montant}
         onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
       />
-      {needsPin ? (
-        <Input
-          label={t('transfer.pinLabel')}
-          placeholder="••••"
-          secureTextEntry
-          keyboardType="number-pad"
-          value={pin}
-          onChangeText={setPin}
-        />
-      ) : null}
+      <Input
+        label={t('transfer.pinLabel')}
+        placeholder="••••"
+        secureTextEntry
+        keyboardType="number-pad"
+        value={pin}
+        onChangeText={setPin}
+      />
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       {success ? (
@@ -166,7 +163,6 @@ function InternalTransferForm() {
   const [success, setSuccess] = useState(null);
 
   const montantValue = Number(montant || 0);
-  const needsPin = montantValue >= PIN_THRESHOLD;
 
   const handleSubmit = async () => {
     setError('');
@@ -175,8 +171,8 @@ function InternalTransferForm() {
       setError(t('transfer.missingFieldsInternal'));
       return;
     }
-    if (needsPin && !pin) {
-      setError(t('transfer.pinRequired', { amount: PIN_THRESHOLD.toLocaleString('fr-FR') }));
+    if (!pin) {
+      setError(t('transfer.pinRequired'));
       return;
     }
     setLoading(true);
@@ -185,7 +181,7 @@ function InternalTransferForm() {
         telephoneDestinataire: telephone,
         montant: montantValue,
         libelle: libelle || undefined,
-        pin: needsPin ? pin : undefined,
+        pin,
       });
       setSuccess(result);
       setTelephone('');
@@ -221,16 +217,14 @@ function InternalTransferForm() {
         value={libelle}
         onChangeText={setLibelle}
       />
-      {needsPin ? (
-        <Input
-          label={t('transfer.pinLabel')}
-          placeholder="••••"
-          secureTextEntry
-          keyboardType="number-pad"
-          value={pin}
-          onChangeText={setPin}
-        />
-      ) : null}
+      <Input
+        label={t('transfer.pinLabel')}
+        placeholder="••••"
+        secureTextEntry
+        keyboardType="number-pad"
+        value={pin}
+        onChangeText={setPin}
+      />
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       {success ? <Text style={styles.successText}>{t('transfer.successInternal')}</Text> : null}
