@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import BrandHeader from '../../components/BrandHeader';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 import colors from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
 import { extractErrorMessage } from '../../api/client';
@@ -46,6 +47,10 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={styles.langRow}>
+          <LanguageSwitcher />
+        </View>
+
         <View style={styles.header}>
           <BrandHeader size="main" showTagline />
         </View>
@@ -95,8 +100,13 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
   },
+  langRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
   header: {
     alignItems: 'center',
+    marginTop: 10,
     marginBottom: 28,
   },
   title: {
