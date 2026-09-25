@@ -14,6 +14,7 @@ import colors, { radii } from '../../theme/colors';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
 import IconRow from '../../components/IconRow';
+import Card from '../../components/Card';
 import { transferInterne, transferExterne, MOBILE_MONEY_OPERATORS } from '../../api/transferts';
 import { extractErrorMessage } from '../../api/client';
 
@@ -100,54 +101,56 @@ function ExternalTransferForm() {
 
   return (
     <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-      <Text style={styles.label}>{t('transfer.operatorLabel')}</Text>
-      {MOBILE_MONEY_OPERATORS.map((op) => {
-        const meta = OPERATOR_META[op.value] || { color: colors.turquoise, icon: 'wallet' };
-        return (
-          <IconRow
-            key={op.value}
-            icon={meta.icon}
-            iconColor={meta.color}
-            label={t(`providers.${op.value}`, { defaultValue: op.label })}
-            selected={operateur === op.value}
-            onPress={() => setOperateur(op.value)}
-            showChevron={false}
-            right={operateur === op.value ? <Icon name="circle-check" size={18} color={meta.color} /> : null}
-          />
-        );
-      })}
+      <Card style={styles.card}>
+        <Text style={styles.label}>{t('transfer.operatorLabel')}</Text>
+        {MOBILE_MONEY_OPERATORS.map((op) => {
+          const meta = OPERATOR_META[op.value] || { color: colors.turquoise, icon: 'wallet' };
+          return (
+            <IconRow
+              key={op.value}
+              icon={meta.icon}
+              iconColor={meta.color}
+              label={t(`providers.${op.value}`, { defaultValue: op.label })}
+              selected={operateur === op.value}
+              onPress={() => setOperateur(op.value)}
+              showChevron={false}
+              right={operateur === op.value ? <Icon name="circle-check" size={18} color={meta.color} /> : null}
+            />
+          );
+        })}
 
-      <Input
-        label={t('transfer.externalNumberLabel')}
-        placeholder={t('transfer.numberPlaceholder')}
-        keyboardType="phone-pad"
-        value={numero}
-        onChangeText={setNumero}
-      />
-      <Input
-        label={t('transfer.amountLabel')}
-        placeholder="0"
-        keyboardType="number-pad"
-        value={montant}
-        onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
-      />
-      <Input
-        label={t('transfer.pinLabel')}
-        placeholder="••••"
-        secureTextEntry
-        keyboardType="number-pad"
-        value={pin}
-        onChangeText={setPin}
-      />
+        <Input
+          label={t('transfer.externalNumberLabel')}
+          placeholder={t('transfer.numberPlaceholder')}
+          keyboardType="phone-pad"
+          value={numero}
+          onChangeText={setNumero}
+        />
+        <Input
+          label={t('transfer.amountLabel')}
+          placeholder="0"
+          keyboardType="number-pad"
+          value={montant}
+          onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
+        />
+        <Input
+          label={t('transfer.pinLabel')}
+          placeholder="••••"
+          secureTextEntry
+          keyboardType="number-pad"
+          value={pin}
+          onChangeText={setPin}
+        />
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      {success ? (
-        <Text style={styles.successText}>
-          {t('transfer.successExternal', { operator: t(`providers.${operateur}`, { defaultValue: operateur }) })}
-        </Text>
-      ) : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {success ? (
+          <Text style={styles.successText}>
+            {t('transfer.successExternal', { operator: t(`providers.${operateur}`, { defaultValue: operateur }) })}
+          </Text>
+        ) : null}
 
-      <GradientButton title={t('transfer.submit')} onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
+        <GradientButton title={t('transfer.submit')} onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
+      </Card>
     </ScrollView>
   );
 }
@@ -197,39 +200,41 @@ function InternalTransferForm() {
 
   return (
     <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-      <Input
-        label={t('transfer.internalNumberLabel')}
-        placeholder={t('transfer.numberPlaceholder')}
-        keyboardType="phone-pad"
-        value={telephone}
-        onChangeText={setTelephone}
-      />
-      <Input
-        label={t('transfer.amountLabel')}
-        placeholder="0"
-        keyboardType="number-pad"
-        value={montant}
-        onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
-      />
-      <Input
-        label={t('transfer.noteLabel')}
-        placeholder={t('transfer.notePlaceholder')}
-        value={libelle}
-        onChangeText={setLibelle}
-      />
-      <Input
-        label={t('transfer.pinLabel')}
-        placeholder="••••"
-        secureTextEntry
-        keyboardType="number-pad"
-        value={pin}
-        onChangeText={setPin}
-      />
+      <Card style={styles.card}>
+        <Input
+          label={t('transfer.internalNumberLabel')}
+          placeholder={t('transfer.numberPlaceholder')}
+          keyboardType="phone-pad"
+          value={telephone}
+          onChangeText={setTelephone}
+        />
+        <Input
+          label={t('transfer.amountLabel')}
+          placeholder="0"
+          keyboardType="number-pad"
+          value={montant}
+          onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
+        />
+        <Input
+          label={t('transfer.noteLabel')}
+          placeholder={t('transfer.notePlaceholder')}
+          value={libelle}
+          onChangeText={setLibelle}
+        />
+        <Input
+          label={t('transfer.pinLabel')}
+          placeholder="••••"
+          secureTextEntry
+          keyboardType="number-pad"
+          value={pin}
+          onChangeText={setPin}
+        />
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      {success ? <Text style={styles.successText}>{t('transfer.successInternal')}</Text> : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {success ? <Text style={styles.successText}>{t('transfer.successInternal')}</Text> : null}
 
-      <GradientButton title={t('transfer.submit')} onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
+        <GradientButton title={t('transfer.submit')} onPress={handleSubmit} loading={loading} icon={<Icon name="paper-plane" size={16} color={colors.text} />} />
+      </Card>
     </ScrollView>
   );
 }
@@ -258,6 +263,7 @@ const styles = StyleSheet.create({
   tabText: { color: colors.textSecondary, fontSize: 12.5, fontWeight: '600' },
   tabTextActive: { color: colors.text },
   form: { padding: 20, paddingBottom: 60 },
+  card: { paddingVertical: 20 },
   label: { color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '500' },
   errorText: { color: colors.error, fontSize: 13, marginBottom: 12, textAlign: 'center' },
   successText: { color: colors.success, fontSize: 13, marginBottom: 12, textAlign: 'center', fontWeight: '600' },

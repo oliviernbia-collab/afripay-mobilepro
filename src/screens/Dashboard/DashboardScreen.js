@@ -6,6 +6,7 @@ import Icon from '../../components/Icon';
 import { LinearGradient } from 'expo-linear-gradient';
 import colors, { gradients, radii } from '../../theme/colors';
 import Card from '../../components/Card';
+import BrandHeader from '../../components/BrandHeader';
 import { KybBadge, TransactionStatusBadge } from '../../components/StatusBadge';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import SideMenu from '../../components/SideMenu';
@@ -13,9 +14,11 @@ import { useAuth } from '../../context/AuthContext';
 import { getMyWallet, getMyHistory, getMyStats } from '../../api/wallet';
 import { formatFcfa, formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
+import { getCached, setCached } from '../../utils/offlineCache';
 import TxTypeIcon from '../../components/TxTypeIcon';
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
+const WALLET_CACHE_KEY = 'wallet';
 
 export default function DashboardScreen({ navigation }) {
   const { t } = useTranslation();
@@ -29,6 +32,10 @@ export default function DashboardScreen({ navigation }) {
   const [error, setError] = useState('');
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  // Support hors-ligne partiel (cahier des charges 9.4) : dernier solde connu affiché depuis le
+  // cache local si l'appel échoue faute de connexion, plutôt que de retomber sur "···".
+  const [walletCachedAt, setWalletCachedAt] = useState(null);
+  const [offline, setOffline] = useState(false);
 
   const ACTIONS = [
     { key: 'encaisser', label: t('dashboard.actionEncaisser'), icon: 'qrcode', color: colors.magenta, route: 'EncaisserAmount' },
@@ -55,8 +62,20 @@ export default function DashboardScreen({ navigation }) {
       const todayStats = stats.find((s) => s.periode === today);
       setTodayEncaisse(Number(todayStats?.total || 0));
       setTodayTransfere(transfersToday.reduce((sum, t2) => sum + Number(t2.montant || 0), 0));
+      setOffline(false);
+      setWalletCachedAt(null);
+      setCached(WALLET_CACHE_KEY, w);
     } catch (e) {
-      setError(extractErrorMessage(e, t('dashboard.loadError')));
+      const cached = await getCached(WALLET_CACHE_KEY);
+      if (cached) {
+        // Hors-ligne (ou serveur injoignable) mais un solde connu existe : on le montre plutôt
+        // qu'une erreur bloquante — le marchand sait au moins où il en était.
+        setWallet(cached.value);
+        setWalletCachedAt(cached.cachedAt);
+        setOffline(true);
+      } else {
+        setError(extractErrorMessage(e, t('dashboard.loadError')));
+      }
     }
   }, [refreshMerchant, t]);
 
@@ -86,6 +105,12 @@ export default function DashboardScreen({ navigation }) {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.magenta} />}
     >
+      {/* Section 10.3 du cahier des charges : le logo doit apparaître dans l'en-tête du
+          tableau de bord (déjà présent sur le splash screen et la page de connexion). */}
+      <View style={styles.brandRow}>
+        <BrandHeader size="icon" showTagline={false} />
+      </View>
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.avatar} activeOpacity={0.8}>
           <Icon name="store" size={20} color={colors.text} />
@@ -129,7 +154,16 @@ export default function DashboardScreen({ navigation }) {
         <Text style={styles.balanceAmount}>
           {loading ? '···' : balanceHidden ? '•••••• FCFA' : formatFcfa(wallet?.solde)}
         </Text>
-        <Text style={styles.balanceSub}>{t('dashboard.balanceSub')}</Text>
+        {offline && walletCachedAt ? (
+          <View style={styles.offlineRow}>
+            <Icon name="wifi" size={11} color={colors.gold} />
+            <Text style={styles.offlineText}>
+              {t('dashboard.offlineBalance', { time: formatDateTime(new Date(walletCachedAt).toISOString()) })}
+            </Text>
+          </View>
+        ) : (
+          <Text style={styles.balanceSub}>{t('dashboard.balanceSub')}</Text>
+        )}
       </LinearGradient>
 
       <View style={styles.todayRow}>
@@ -222,6 +256,11 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingBottom: 40,
+  },
+  brandRow: {
+    alignItems: 'center',
+    marginTop: 4,
+    marginBottom: 10,
   },
   header: {
     flexDirection: 'row',
@@ -316,6 +355,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontWeight: '600',
   },
+  offlineRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  offlineText: { color: colors.gold, fontSize: 11.5, fontWeight: '600' },
   errorText: {
     color: colors.error,
     fontSize: 13,

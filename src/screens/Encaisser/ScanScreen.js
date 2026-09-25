@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,16 +9,50 @@ import colors, { gradients } from '../../theme/colors';
 import GradientButton from '../../components/GradientButton';
 import PinDots from '../../components/PinDots';
 import PinKeypad from '../../components/PinKeypad';
+import PalmBiometricWebView from '../../components/PalmBiometricWebView';
 import { formatFcfa } from '../../utils/format';
 import { encaisser } from '../../api/marchand';
+import { getRecognitionSession } from '../../api/biometrie';
 import { extractErrorMessage } from '../../api/client';
+import { TENCENT_PALM_ENABLED } from '../../config/features';
 
 const PIN_LENGTH = 4;
 
+function ModeToggle({ mode, onChange }) {
+  const { t } = useTranslation();
+  if (!TENCENT_PALM_ENABLED) return null;
+  return (
+    <View style={styles.modeToggle}>
+      <Pressable style={[styles.modeTab, mode === 'recognition' && styles.modeTabActive]} onPress={() => onChange('recognition')}>
+        <Icon name="hand" size={13} color={mode === 'recognition' ? colors.text : colors.textMuted} />
+        <Text style={[styles.modeTabText, mode === 'recognition' && styles.modeTabTextActive]}>
+          {t('encaisser.scan.modePalm')}
+        </Text>
+      </Pressable>
+      <Pressable style={[styles.modeTab, mode === 'qr' && styles.modeTabActive]} onPress={() => onChange('qr')}>
+        <Icon name="qrcode" size={13} color={mode === 'qr' ? colors.text : colors.textMuted} />
+        <Text style={[styles.modeTabText, mode === 'qr' && styles.modeTabTextActive]}>{t('encaisser.scan.modeQr')}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+// Deux méthodes d'identification du client (cahier des charges 4.2/6.3) :
+//  - 'recognition' (option 1) : reconnaissance palmaire réelle via le widget Tencent PalmAI —
+//    identifie le client sans qu'il n'ait rien à afficher sur son propre téléphone. Actif
+//    seulement si TENCENT_PALM_ENABLED (voir config/features.js) ; sinon l'écran démarre
+//    directement en 'qr' ci-dessous, comportement inchangé pour tout le monde tant que le tenant
+//    Tencent n'est pas provisionné.
+//  - 'qr' (option 2, repli) : le client affiche un QR sur son écran "Payer", le marchand le
+//    scanne. Toujours disponible, y compris en secours si la reconnaissance échoue/expire.
 export default function ScanScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { montant } = route.params;
   const [permission, requestPermission] = useCameraPermissions();
+  const [mode, setMode] = useState(TENCENT_PALM_ENABLED ? 'recognition' : 'qr');
+  const [recognitionSession, setRecognitionSession] = useState(null);
+  const [recognitionLoading, setRecognitionLoading] = useState(false);
+  const [recognitionError, setRecognitionError] = useState('');
   const [scanning, setScanning] = useState(true);
   const [processing, setProcessing] = useState(false);
   // Au-delà d'un certain montant, le backend exige une confirmation par PIN CLIENT (cahier des
@@ -30,7 +64,33 @@ export default function ScanScreen({ route, navigation }) {
   const [clientPin, setClientPin] = useState('');
   const [pinError, setPinError] = useState('');
   const scannedRef = useRef(false);
-  const palmCodeRef = useRef(null);
+  const identificationRef = useRef(null);
+
+  const startRecognitionSession = useCallback(async () => {
+    setRecognitionError('');
+    setRecognitionLoading(true);
+    try {
+      const session = await getRecognitionSession();
+      setRecognitionSession(session);
+    } catch (_error) {
+      // Tencent désactivé/indisponible : on bascule silencieusement sur le QR plutôt que de
+      // bloquer l'encaissement sur une dépendance externe non provisionnée.
+      setMode('qr');
+    } finally {
+      setRecognitionLoading(false);
+    }
+  }, []);
+
+  // Bascule vers la reconnaissance palmaire et lance immédiatement une session — appelé au
+  // lieu d'un simple setMode('recognition') partout où ce mode est choisi (arrivée sur l'écran,
+  // bascule manuelle depuis le QR, "Réessayer"), plutôt que de dériver l'appel réseau d'un effet
+  // gardé sur `mode` : un effet qui ne fait qu'appeler setState au montage n'apporte rien qu'un
+  // appel direct n'apporte déjà, et évite un rendu en cascade superflu.
+  const switchToRecognition = useCallback(() => {
+    setMode('recognition');
+    setRecognitionSession(null);
+    startRecognitionSession();
+  }, [startRecognitionSession]);
 
   // Reset the scan lock whenever this screen regains focus (e.g. after "Réessayer").
   useFocusEffect(
@@ -41,21 +101,29 @@ export default function ScanScreen({ route, navigation }) {
       setNeedsClientPin(false);
       setClientPin('');
       setPinError('');
+      if (TENCENT_PALM_ENABLED) {
+        switchToRecognition();
+      } else {
+        setMode('qr');
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
   );
 
-  const attemptEncaisser = async (palmCode, pin) => {
+  const handleModeChange = (m) => (m === 'recognition' ? switchToRecognition() : setMode('qr'));
+
+  const attemptEncaisser = async (identification, pin) => {
     setProcessing(true);
     try {
-      const result = await encaisser({ montant, palmCode, clientPin: pin });
+      const result = await encaisser({ montant, clientPin: pin, ...identification });
       navigation.replace('EncaisserReceipt', { success: true, montant, result });
     } catch (e) {
       const status = e?.response?.status;
       const message = extractErrorMessage(e, t('encaisser.scan.paymentFailed'));
       if (status === 400 && !pin && /code pin/i.test(message)) {
-        // Le serveur demande une confirmation PIN pour ce montant : on garde le palmCode déjà
-        // identifié et on bascule sur le clavier PIN plutôt que de re-scanner.
-        palmCodeRef.current = palmCode;
+        // Le serveur demande une confirmation PIN pour ce montant : on garde l'identification déjà
+        // établie et on bascule sur le clavier PIN plutôt que de recommencer l'identification.
+        identificationRef.current = identification;
         setNeedsClientPin(true);
         setProcessing(false);
         return;
@@ -76,7 +144,24 @@ export default function ScanScreen({ route, navigation }) {
     if (scannedRef.current || processing) return;
     scannedRef.current = true;
     setScanning(false);
-    attemptEncaisser(data, undefined);
+    attemptEncaisser({ palmCode: data }, undefined);
+  };
+
+  const handleRecognitionResult = (result) => {
+    const session = recognitionSession;
+    setRecognitionSession(null);
+    if (!session || result?.code !== 0 || !result?.data?.userId) {
+      setRecognitionError(result?.message || t('encaisser.scan.recognitionError'));
+      return;
+    }
+    attemptEncaisser(
+      {
+        recognitionSessionId: session.sessionId,
+        recognitionUserId: result.data.userId,
+        recognitionScore: result.data.score,
+      },
+      undefined
+    );
   };
 
   const onPinDigit = (d) => {
@@ -85,7 +170,7 @@ export default function ScanScreen({ route, navigation }) {
     const next = clientPin + d;
     setClientPin(next);
     if (next.length === PIN_LENGTH) {
-      attemptEncaisser(palmCodeRef.current, next);
+      attemptEncaisser(identificationRef.current, next);
     }
   };
 
@@ -123,6 +208,54 @@ export default function ScanScreen({ route, navigation }) {
     );
   }
 
+
+  if (mode === 'recognition') {
+    return (
+      <View style={styles.container}>
+        <View style={styles.amountBar}>
+          <Text style={styles.amountLabel}>{t('encaisser.scan.amountLabel')}</Text>
+          <Text style={styles.amountValue}>{formatFcfa(montant)}</Text>
+        </View>
+        <ModeToggle mode={mode} onChange={handleModeChange} />
+        <View style={styles.centered}>
+          {processing ? (
+            <>
+              <ActivityIndicator size="large" color={colors.text} />
+              <Text style={styles.processingText}>{t('encaisser.scan.verifying')}</Text>
+            </>
+          ) : recognitionLoading ? (
+            <>
+              <ActivityIndicator size="large" color={colors.magenta} />
+              <Text style={styles.permText}>{t('encaisser.scan.recognitionLoading')}</Text>
+            </>
+          ) : (
+            <>
+              <Icon name="hand" size={48} color={colors.magenta} />
+              <Text style={styles.permTitle}>{t('encaisser.scan.recognitionTitle')}</Text>
+              <Text style={styles.permText}>{t('encaisser.scan.recognitionInstructions')}</Text>
+              {recognitionError ? <Text style={styles.errorTextPin}>{recognitionError}</Text> : null}
+              <GradientButton
+                title={t('encaisser.scan.retry')}
+                onPress={startRecognitionSession}
+                style={{ marginTop: 20, width: '100%' }}
+              />
+            </>
+          )}
+        </View>
+        <Pressable onPress={() => setMode('qr')} style={styles.fallbackLink}>
+          <Text style={styles.fallbackLinkText}>{t('encaisser.scan.useQr')}</Text>
+        </Pressable>
+
+        <PalmBiometricWebView
+          visible={!!recognitionSession}
+          session={recognitionSession}
+          onResult={handleRecognitionResult}
+          onClose={() => setRecognitionSession(null)}
+        />
+      </View>
+    );
+  }
+
   if (!permission) {
     return (
       <View style={styles.centered}>
@@ -152,6 +285,7 @@ export default function ScanScreen({ route, navigation }) {
         <Text style={styles.amountLabel}>{t('encaisser.scan.amountLabel')}</Text>
         <Text style={styles.amountValue}>{formatFcfa(montant)}</Text>
       </View>
+      <ModeToggle mode={mode} onChange={handleModeChange} />
 
       <View style={styles.cameraWrap}>
         <CameraView
@@ -185,6 +319,11 @@ export default function ScanScreen({ route, navigation }) {
       </View>
 
       <Text style={styles.instructions}>{t('encaisser.scan.instructions')}</Text>
+      {TENCENT_PALM_ENABLED ? (
+        <Pressable onPress={switchToRecognition} style={styles.fallbackLink}>
+          <Text style={styles.fallbackLinkText}>{t('encaisser.scan.usePalm')}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -209,6 +348,30 @@ const styles = StyleSheet.create({
   },
   amountLabel: { color: colors.textMuted, fontSize: 12 },
   amountValue: { color: colors.text, fontSize: 20, fontWeight: '800', marginTop: 2 },
+  modeToggle: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 12,
+    backgroundColor: colors.card,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 4,
+    gap: 4,
+  },
+  modeTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+  },
+  modeTabActive: { backgroundColor: colors.magenta },
+  modeTabText: { color: colors.textMuted, fontSize: 12.5, fontWeight: '600' },
+  modeTabTextActive: { color: colors.text },
+  fallbackLink: { alignItems: 'center', paddingVertical: 16 },
+  fallbackLinkText: { color: colors.turquoise, fontSize: 13, fontWeight: '600' },
   pinContainer: { flex: 1, alignItems: 'center', paddingHorizontal: 24, paddingTop: 32 },
   pinTitle: { color: colors.text, fontSize: 18, fontWeight: '700', marginTop: 14, textAlign: 'center' },
   pinSubtitle: { color: colors.textSecondary, fontSize: 13, marginTop: 8, textAlign: 'center', lineHeight: 19 },

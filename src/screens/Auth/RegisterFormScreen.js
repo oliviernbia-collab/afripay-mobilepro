@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
+import Card from '../../components/Card';
 import colors from '../../theme/colors';
 import { requestMerchantOtp } from '../../api/auth';
 import { extractErrorMessage } from '../../api/client';
@@ -67,71 +68,73 @@ export default function RegisterFormScreen({ route, navigation }) {
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>
-          {isEntreprise ? t('auth.registerForm.titleEntreprise') : t('auth.registerForm.titleParticulier')}
-        </Text>
-        <Text style={styles.subtitle}>
-          {isEntreprise ? t('auth.registerForm.subtitleEntreprise') : t('auth.registerForm.subtitleParticulier')}
-        </Text>
+        <Card style={styles.card}>
+          <Text style={styles.title}>
+            {isEntreprise ? t('auth.registerForm.titleEntreprise') : t('auth.registerForm.titleParticulier')}
+          </Text>
+          <Text style={styles.subtitle}>
+            {isEntreprise ? t('auth.registerForm.subtitleEntreprise') : t('auth.registerForm.subtitleParticulier')}
+          </Text>
 
-        {isEntreprise ? (
-          <>
-            <Input
-              label={t('auth.registerForm.raisonSocialeLabel')}
-              placeholder={t('auth.registerForm.raisonSocialePlaceholder')}
-              value={raisonSociale}
-              onChangeText={setRaisonSociale}
-            />
-            <Input
-              label={t('auth.registerForm.rccmLabel')}
-              placeholder={t('auth.registerForm.rccmPlaceholder')}
-              value={rccm}
-              onChangeText={setRccm}
-              autoCapitalize="characters"
-            />
-            <Input
-              label={t('auth.registerForm.nccLabel')}
-              placeholder={t('auth.registerForm.nccPlaceholder')}
-              value={ncc}
-              onChangeText={setNcc}
-              autoCapitalize="characters"
-            />
-          </>
-        ) : null}
+          {isEntreprise ? (
+            <>
+              <Input
+                label={t('auth.registerForm.raisonSocialeLabel')}
+                placeholder={t('auth.registerForm.raisonSocialePlaceholder')}
+                value={raisonSociale}
+                onChangeText={setRaisonSociale}
+              />
+              <Input
+                label={t('auth.registerForm.rccmLabel')}
+                placeholder={t('auth.registerForm.rccmPlaceholder')}
+                value={rccm}
+                onChangeText={setRccm}
+                autoCapitalize="characters"
+              />
+              <Input
+                label={t('auth.registerForm.nccLabel')}
+                placeholder={t('auth.registerForm.nccPlaceholder')}
+                value={ncc}
+                onChangeText={setNcc}
+                autoCapitalize="characters"
+              />
+            </>
+          ) : null}
 
-        <Input
-          label={t('auth.registerForm.phoneLabel')}
-          placeholder={t('auth.registerForm.phonePlaceholder')}
-          keyboardType="phone-pad"
-          value={telephone}
-          onChangeText={setTelephone}
-        />
-        <Input
-          label={t('auth.registerForm.emailLabel')}
-          placeholder={t('auth.registerForm.emailPlaceholder')}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <Input
-          label={t('auth.registerForm.passwordLabel')}
-          placeholder={t('auth.registerForm.passwordPlaceholder')}
-          secureTextEntry
-          value={motDePasse}
-          onChangeText={setMotDePasse}
-        />
-        <Input
-          label={t('auth.registerForm.confirmLabel')}
-          placeholder="••••••••"
-          secureTextEntry
-          value={motDePasseConfirm}
-          onChangeText={setMotDePasseConfirm}
-        />
+          <Input
+            label={t('auth.registerForm.phoneLabel')}
+            placeholder={t('auth.registerForm.phonePlaceholder')}
+            keyboardType="phone-pad"
+            value={telephone}
+            onChangeText={setTelephone}
+          />
+          <Input
+            label={t('auth.registerForm.emailLabel')}
+            placeholder={t('auth.registerForm.emailPlaceholder')}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <Input
+            label={t('auth.registerForm.passwordLabel')}
+            placeholder={t('auth.registerForm.passwordPlaceholder')}
+            secureTextEntry
+            value={motDePasse}
+            onChangeText={setMotDePasse}
+          />
+          <Input
+            label={t('auth.registerForm.confirmLabel')}
+            placeholder="••••••••"
+            secureTextEntry
+            value={motDePasseConfirm}
+            onChangeText={setMotDePasseConfirm}
+          />
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <GradientButton title={t('auth.registerForm.continue')} onPress={handleContinue} loading={loading} style={{ marginTop: 8 }} />
+          <GradientButton title={t('auth.registerForm.continue')} onPress={handleContinue} loading={loading} style={{ marginTop: 8 }} />
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -145,6 +148,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 40,
+  },
+  card: {
+    paddingVertical: 20,
   },
   title: {
     color: colors.text,

@@ -1,5 +1,15 @@
 {
+  "appLockGate": {
+    "title": "AfriPay verrouillé",
+    "subtitle": "Authentifiez-vous pour accéder à votre compte.",
+    "unlock": "Déverrouiller",
+    "authCancelled": "Authentification annulée ou échouée.",
+    "authUnavailable": "Impossible de vérifier votre identité sur cet appareil.",
+    "promptMessage": "Déverrouiller AfriPay Pro",
+    "promptCancelLabel": "Annuler"
+  },
   "common": {
+    "ok": "OK",
     "cancel": "Annuler",
     "save": "Enregistrer",
     "send": "Envoyer",
@@ -95,6 +105,7 @@
     "kybBannerText": "Compte en attente de validation — vous pourrez encaisser dès que votre dossier sera validé. Appuyez pour compléter votre dossier KYB.",
     "balanceLabel": "Solde disponible",
     "balanceSub": "Portefeuille AfriPay Marchand",
+    "offlineBalance": "Hors ligne — solde du {{time}}",
     "today": "Aujourd'hui",
     "todayEncaissements": "Encaissements",
     "todayTransferts": "Transferts",
@@ -116,7 +127,8 @@
       "noAccount": "Pas encore de compte marchand ?",
       "createAccount": "Créer un compte",
       "missingFields": "Veuillez renseigner votre téléphone et votre mot de passe.",
-      "error": "Connexion impossible. Vérifiez vos identifiants."
+      "error": "Connexion impossible. Vérifiez vos identifiants.",
+      "forgotPassword": "Mot de passe oublié ?"
     },
     "otp": {
       "title": "Vérification du numéro",
@@ -193,7 +205,16 @@
       "paymentFailed": "Le paiement a échoué.",
       "clientPinTitle": "Code PIN du client requis",
       "clientPinSubtitle": "Ce montant nécessite une confirmation. Faites saisir au client son code PIN AfriPay.",
-      "clientPinCancel": "Annuler"
+      "clientPinCancel": "Annuler",
+      "modePalm": "Paume",
+      "modeQr": "QR",
+      "recognitionTitle": "Reconnaissance palmaire",
+      "recognitionInstructions": "Demandez au client de présenter sa paume devant la caméra.",
+      "recognitionLoading": "Préparation du scan…",
+      "recognitionError": "La reconnaissance a échoué. Réessayez ou utilisez le QR du client.",
+      "retry": "Réessayer",
+      "useQr": "Scanner le QR du client à la place",
+      "usePalm": "Essayer la reconnaissance palmaire"
     },
     "receipt": {
       "successTitle": "Paiement accepté",
@@ -216,6 +237,7 @@
     "exportTitle": "Exporter l'historique",
     "exportEmpty": "Aucune transaction à exporter.",
     "exportError": "Impossible de générer l'export.",
+    "exportSuccess": "Export généré avec succès.",
     "exportUnavailable": "Le partage de fichiers n'est pas disponible sur cet appareil.",
     "csv": {
       "date": "Date",
@@ -269,6 +291,7 @@
     "rccmLabel": "RCCM",
     "nccLabel": "NCC / NIF",
     "sectionAccount": "Compte",
+    "sectionSecurity": "Sécurité",
     "sectionHelp": "Aide",
     "sectionLegal": "Légal",
     "kybMenu": "Validation du compte (KYB)",
@@ -279,7 +302,27 @@
     "privacyMenu": "Politique de confidentialité",
     "logout": "Se déconnecter",
     "logoutConfirmTitle": "Déconnexion",
-    "logoutConfirmText": "Voulez-vous vraiment vous déconnecter ?"
+    "logoutConfirmText": "Voulez-vous vraiment vous déconnecter ?",
+    "biometricLockTitle": "Biométrie du téléphone",
+    "biometricLockSubtitle": "Face ID / empreinte pour ouvrir l'app",
+    "biometricActivationCancelledText": "L'authentification n'a pas pu être vérifiée.",
+    "biometricEnabledSuccess": "Verrouillage biométrique activé.",
+    "biometricDisabledSuccess": "Verrouillage biométrique désactivé.",
+    "logo": {
+      "title": "Logo de l'entreprise",
+      "takePhoto": "Prendre une photo",
+      "chooseGallery": "Choisir dans la galerie",
+      "remove": "Retirer le logo",
+      "removeConfirmTitle": "Retirer le logo",
+      "removeConfirmText": "Voulez-vous vraiment retirer le logo de votre profil ?",
+      "permissionDeniedTitle": "Autorisation refusée",
+      "permissionDeniedText": "AfriPay a besoin d'accéder à la caméra ou à la galerie pour changer le logo.",
+      "genericError": "Une erreur est survenue",
+      "uploadError": "Impossible d'envoyer le logo. Réessayez.",
+      "removeError": "Impossible de retirer le logo. Réessayez.",
+      "uploadSuccess": "Logo mis à jour.",
+      "removeSuccess": "Logo retiré."
+    }
   },
   "support": {
     "title": "Obtenir de l'aide",
@@ -310,7 +353,36 @@
     "mismatchError": "Les codes PIN ne correspondent pas. Recommencez.",
     "saveError": "Impossible de mettre à jour le code PIN.",
     "successText": "Code PIN mis à jour.",
-    "securityNote": "Ne partagez jamais ce code. AfriPay ne vous le demandera jamais par téléphone ou SMS."
+    "securityNote": "Ne partagez jamais ce code. AfriPay ne vous le demandera jamais par téléphone ou SMS.",
+    "forgotPin": "Code PIN oublié ?"
+  },
+  "forgotAccess": {
+    "titlePin": "Code PIN AfriPay oublié",
+    "titlePassword": "Mot de passe oublié",
+    "subtitlePin": "Un code de vérification sera envoyé au numéro de votre compte marchand.",
+    "subtitlePassword": "Saisissez votre numéro de téléphone pour recevoir un code de vérification.",
+    "phoneLabel": "Numéro de téléphone",
+    "phonePlaceholder": "Ex: 0700000000",
+    "sendCode": "Envoyer le code",
+    "missingPhone": "Veuillez saisir votre numéro de téléphone.",
+    "otpError": "Impossible d'envoyer le code.",
+    "resetTitlePin": "Nouveau code PIN AfriPay",
+    "resetTitlePassword": "Nouveau mot de passe",
+    "resetSubtitle": "Un code a été envoyé au {{phone}}.",
+    "codeLabel": "Code de vérification",
+    "newPinLabel": "Nouveau code PIN",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Au moins 6 caractères",
+    "confirmLabel": "Confirmer",
+    "submit": "Réinitialiser",
+    "missingCode": "Veuillez saisir le code reçu par SMS.",
+    "pinInvalid": "Le code PIN doit contenir 4 à 6 chiffres.",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères.",
+    "mismatch": "Les deux saisies ne correspondent pas.",
+    "successTitle": "Réinitialisation réussie",
+    "successTextPin": "Votre code PIN AfriPay a été mis à jour.",
+    "successTextPassword": "Votre mot de passe a été mis à jour. Reconnectez-vous avec votre nouveau mot de passe.",
+    "error": "Impossible de réinitialiser. Vérifiez le code reçu par SMS."
   },
   "kyb": {
     "home": {

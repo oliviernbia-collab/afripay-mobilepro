@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { File, Paths } from 'expo-file-system';
@@ -9,6 +9,7 @@ import colors, { radii } from '../../theme/colors';
 import Card from '../../components/Card';
 import TxTypeIcon from '../../components/TxTypeIcon';
 import { TransactionStatusBadge } from '../../components/StatusBadge';
+import { useToast } from '../../context/ToastContext';
 import { getMyHistory, getMyStats, getMyWallet } from '../../api/wallet';
 import { formatFcfa, formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
@@ -21,6 +22,7 @@ function csvCell(value) {
 
 export default function HistoriqueScreen({ navigation }) {
   const { t } = useTranslation();
+  const { showWarning, showError, showSuccess } = useToast();
   const [walletId, setWalletId] = useState(null);
   const [period, setPeriod] = useState('jour');
   const [typeFilter, setTypeFilter] = useState(undefined);
@@ -75,14 +77,14 @@ export default function HistoriqueScreen({ navigation }) {
 
   const onExport = async () => {
     if (!transactions.length) {
-      Alert.alert(t('historique.exportTitle'), t('historique.exportEmpty'));
+      showWarning(t('historique.exportEmpty'));
       return;
     }
     setExporting(true);
     try {
       const canShare = await Sharing.isAvailableAsync();
       if (!canShare) {
-        Alert.alert(t('historique.exportTitle'), t('historique.exportUnavailable'));
+        showWarning(t('historique.exportUnavailable'));
         return;
       }
 
@@ -115,8 +117,9 @@ export default function HistoriqueScreen({ navigation }) {
       file.write(csv);
 
       await Sharing.shareAsync(file.uri, { mimeType: 'text/csv', dialogTitle: t('historique.exportTitle') });
+      showSuccess(t('historique.exportSuccess'));
     } catch (e) {
-      Alert.alert(t('historique.exportTitle'), extractErrorMessage(e, t('historique.exportError')));
+      showError(extractErrorMessage(e, t('historique.exportError')));
     } finally {
       setExporting(false);
     }

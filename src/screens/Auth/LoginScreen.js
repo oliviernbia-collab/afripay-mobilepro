@@ -13,6 +13,7 @@ import BrandHeader from '../../components/BrandHeader';
 import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
+import Card from '../../components/Card';
 import colors from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
 import { extractErrorMessage } from '../../api/client';
@@ -55,37 +56,46 @@ export default function LoginScreen({ navigation }) {
           <BrandHeader size="main" showTagline />
         </View>
 
-        <Text style={styles.title}>{t('auth.login.title')}</Text>
-        <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
+        <Card style={styles.card}>
+          <Text style={styles.title}>{t('auth.login.title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
 
-        <View style={styles.form}>
-          <Input
-            label={t('auth.login.phoneLabel')}
-            placeholder={t('auth.login.phonePlaceholder')}
-            keyboardType="phone-pad"
-            autoCapitalize="none"
-            value={telephone}
-            onChangeText={setTelephone}
-          />
-          <Input
-            label={t('auth.login.passwordLabel')}
-            placeholder="••••••••"
-            secureTextEntry
-            autoCapitalize="none"
-            value={motDePasse}
-            onChangeText={setMotDePasse}
-          />
+          <View style={styles.form}>
+            <Input
+              label={t('auth.login.phoneLabel')}
+              placeholder={t('auth.login.phonePlaceholder')}
+              keyboardType="phone-pad"
+              autoCapitalize="none"
+              value={telephone}
+              onChangeText={setTelephone}
+            />
+            <Input
+              label={t('auth.login.passwordLabel')}
+              placeholder="••••••••"
+              secureTextEntry
+              autoCapitalize="none"
+              value={motDePasse}
+              onChangeText={setMotDePasse}
+            />
 
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ForgotAccessPhone', { type: 'password' })}
+              style={styles.forgotLink}
+            >
+              <Text style={styles.forgotLinkText}>{t('auth.login.forgotPassword')}</Text>
+            </TouchableOpacity>
 
-          <GradientButton title={t('auth.login.submit')} onPress={handleLogin} loading={loading} style={styles.submitBtn} />
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-          <TouchableOpacity onPress={() => navigation.navigate('RegisterType')} style={styles.registerLink}>
-            <Text style={styles.registerText}>
-              {t('auth.login.noAccount')} <Text style={styles.registerTextStrong}>{t('auth.login.createAccount')}</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <GradientButton title={t('auth.login.submit')} onPress={handleLogin} loading={loading} style={styles.submitBtn} />
+
+            <TouchableOpacity onPress={() => navigation.navigate('RegisterType')} style={styles.registerLink}>
+              <Text style={styles.registerText}>
+                {t('auth.login.noAccount')} <Text style={styles.registerTextStrong}>{t('auth.login.createAccount')}</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -97,7 +107,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: colors.background,
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 16,
     paddingBottom: 40,
   },
   langRow: {
@@ -106,8 +116,11 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 28,
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  card: {
+    paddingVertical: 20,
   },
   title: {
     color: colors.text,
@@ -120,10 +133,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginTop: 6,
-    marginBottom: 28,
+    marginBottom: 20,
   },
   form: {
-    marginTop: 8,
+    marginTop: 4,
   },
   submitBtn: {
     marginTop: 8,
@@ -133,6 +146,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 12,
     textAlign: 'center',
+  },
+  forgotLink: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+  },
+  forgotLinkText: {
+    color: colors.turquoise,
+    fontSize: 12.5,
+    fontWeight: '600',
   },
   registerLink: {
     marginTop: 24,

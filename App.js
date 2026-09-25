@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import './src/i18n';
 import { LanguageProvider } from './src/context/LanguageContext';
 import { AuthProvider } from './src/context/AuthContext';
+import { ToastProvider } from './src/context/ToastContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import colors from './src/theme/colors';
+import { initOfflineReadQueue } from './src/utils/offlineReadQueue';
+import { markNotificationRead } from './src/api/notifications';
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -22,13 +25,19 @@ const navigationTheme = {
 };
 
 export default function App() {
+  useEffect(() => {
+    initOfflineReadQueue(markNotificationRead);
+  }, []);
+
   return (
     <SafeAreaProvider>
       <LanguageProvider>
         <AuthProvider>
           <NavigationContainer theme={navigationTheme}>
-            <StatusBar style="light" />
-            <RootNavigator />
+            <ToastProvider>
+              <StatusBar style="light" />
+              <RootNavigator />
+            </ToastProvider>
           </NavigationContainer>
         </AuthProvider>
       </LanguageProvider>

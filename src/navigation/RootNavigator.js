@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
 import AuthNavigator from './AuthNavigator';
 import MainTabNavigator from './MainTabNavigator';
+import AppLockGate from '../components/AppLockGate';
 
 import AmountScreen from '../screens/Encaisser/AmountScreen';
 import ScanScreen from '../screens/Encaisser/ScanScreen';
@@ -17,6 +18,8 @@ import KybUploadScreen from '../screens/Kyb/KybUploadScreen';
 
 import TransactionDetailScreen from '../screens/Historique/TransactionDetailScreen';
 import ChangePinScreen from '../screens/Settings/ChangePinScreen';
+import ForgotAccessPhoneScreen from '../screens/Auth/ForgotAccessPhoneScreen';
+import ForgotAccessResetScreen from '../screens/Auth/ForgotAccessResetScreen';
 import AboutScreen from '../screens/Settings/AboutScreen';
 import SupportScreen from '../screens/Settings/SupportScreen';
 import TermsScreen from '../screens/Settings/TermsScreen';
@@ -39,41 +42,51 @@ export default function RootNavigator() {
     return <SplashScreen />;
   }
 
-  return (
-    <Stack.Navigator screenOptions={screenOptions}>
-      {!isAuthenticated ? (
+  if (!isAuthenticated) {
+    return (
+      <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="Auth" component={AuthNavigator} options={{ headerShown: false }} />
-      ) : (
-        <>
-          <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    );
+  }
 
-          <Stack.Screen name="EncaisserAmount" component={AmountScreen} options={{ title: t('headers.encaisser') }} />
-          <Stack.Screen
-            name="EncaisserScan"
-            component={ScanScreen}
-            options={{ title: t('headers.scanPayment'), headerBackVisible: true }}
-          />
-          <Stack.Screen
-            name="EncaisserReceipt"
-            component={ReceiptScreen}
-            options={{ title: t('headers.receipt'), headerBackVisible: false, gestureEnabled: false }}
-          />
+  // AppLockGate n'enroule que la partie authentifiée (jamais AuthNavigator ci-dessus) : un
+  // Stack.Navigator complet et distinct, comme dans mobileclient/src/navigation/RootNavigator.js,
+  // plutôt qu'un composant conditionnel entre des Stack.Screen (react-navigation exige que les
+  // écrans soient des enfants directs du Navigator).
+  return (
+    <AppLockGate>
+      <Stack.Navigator screenOptions={screenOptions}>
+        <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
 
-          <Stack.Screen name="Kyb" component={KybScreen} options={{ title: t('headers.kyb') }} />
-          <Stack.Screen name="KybUpload" component={KybUploadScreen} options={{ title: t('headers.kybUpload') }} />
+        <Stack.Screen name="EncaisserAmount" component={AmountScreen} options={{ title: t('headers.encaisser') }} />
+        <Stack.Screen
+          name="EncaisserScan"
+          component={ScanScreen}
+          options={{ title: t('headers.scanPayment'), headerBackVisible: true }}
+        />
+        <Stack.Screen
+          name="EncaisserReceipt"
+          component={ReceiptScreen}
+          options={{ title: t('headers.receipt'), headerBackVisible: false, gestureEnabled: false }}
+        />
 
-          <Stack.Screen
-            name="TransactionDetail"
-            component={TransactionDetailScreen}
-            options={{ title: t('headers.transactionDetail') }}
-          />
-          <Stack.Screen name="ChangePin" component={ChangePinScreen} options={{ title: t('headers.changePin') }} />
-          <Stack.Screen name="About" component={AboutScreen} options={{ title: t('headers.about') }} />
-          <Stack.Screen name="Support" component={SupportScreen} options={{ title: t('headers.support') }} />
-          <Stack.Screen name="Terms" component={TermsScreen} options={{ title: t('headers.terms') }} />
-          <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ title: t('headers.privacy') }} />
-        </>
-      )}
-    </Stack.Navigator>
+        <Stack.Screen name="Kyb" component={KybScreen} options={{ title: t('headers.kyb') }} />
+        <Stack.Screen name="KybUpload" component={KybUploadScreen} options={{ title: t('headers.kybUpload') }} />
+
+        <Stack.Screen
+          name="TransactionDetail"
+          component={TransactionDetailScreen}
+          options={{ title: t('headers.transactionDetail') }}
+        />
+        <Stack.Screen name="ChangePin" component={ChangePinScreen} options={{ title: t('headers.changePin') }} />
+        <Stack.Screen name="ForgotAccessPhone" component={ForgotAccessPhoneScreen} options={{ title: '' }} />
+        <Stack.Screen name="ForgotAccessReset" component={ForgotAccessResetScreen} options={{ title: '' }} />
+        <Stack.Screen name="About" component={AboutScreen} options={{ title: t('headers.about') }} />
+        <Stack.Screen name="Support" component={SupportScreen} options={{ title: t('headers.support') }} />
+        <Stack.Screen name="Terms" component={TermsScreen} options={{ title: t('headers.terms') }} />
+        <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ title: t('headers.privacy') }} />
+      </Stack.Navigator>
+    </AppLockGate>
   );
 }

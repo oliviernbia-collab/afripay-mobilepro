@@ -8,6 +8,7 @@ import Card from '../../components/Card';
 import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../../api/notifications';
 import { formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
+import { enqueueMarkRead } from '../../utils/offlineReadQueue';
 
 const TYPE_ICONS = {
   transaction: 'money-bill-transfer',
@@ -51,7 +52,15 @@ export default function NotificationsScreen() {
       try {
         await markNotificationRead(item.id);
       } catch (e) {
-        // Non-blocking: revert silently on next refresh if it actually failed.
+        if (e.response) {
+          // Le serveur a répondu et a refusé — l'optimisme n'était pas justifié, on revient en arrière.
+          setItems((prev) => prev.map((n) => (n.id === item.id ? { ...n, lu: 0 } : n)));
+        } else {
+          // Échec réseau (axios n'a reçu aucune réponse) : on garde l'affichage "lu" tel que le
+          // marchand l'a vu, et on met l'action de côté pour la rejouer dès que la connexion revient
+          // (voir utils/offlineReadQueue.js) plutôt que de la perdre silencieusement.
+          await enqueueMarkRead(item.id);
+        }
       }
     }
   };

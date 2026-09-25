@@ -1,5 +1,15 @@
 {
+  "appLockGate": {
+    "title": "AfriPay locked",
+    "subtitle": "Authenticate to access your account.",
+    "unlock": "Unlock",
+    "authCancelled": "Authentication cancelled or failed.",
+    "authUnavailable": "Unable to verify your identity on this device.",
+    "promptMessage": "Unlock AfriPay Pro",
+    "promptCancelLabel": "Cancel"
+  },
   "common": {
+    "ok": "OK",
     "cancel": "Cancel",
     "save": "Save",
     "send": "Send",
@@ -95,6 +105,7 @@
     "kybBannerText": "Account pending validation — you'll be able to collect payments once your file is approved. Tap to complete your KYB file.",
     "balanceLabel": "Available balance",
     "balanceSub": "AfriPay Merchant wallet",
+    "offlineBalance": "Offline — balance as of {{time}}",
     "today": "Today",
     "todayEncaissements": "Collections",
     "todayTransferts": "Transfers",
@@ -116,7 +127,8 @@
       "noAccount": "Don't have a merchant account yet?",
       "createAccount": "Create an account",
       "missingFields": "Please enter your phone number and password.",
-      "error": "Sign-in failed. Check your credentials."
+      "error": "Sign-in failed. Check your credentials.",
+      "forgotPassword": "Forgot password?"
     },
     "otp": {
       "title": "Phone verification",
@@ -193,7 +205,16 @@
       "paymentFailed": "The payment failed.",
       "clientPinTitle": "Client PIN required",
       "clientPinSubtitle": "This amount requires confirmation. Have the client enter their AfriPay PIN.",
-      "clientPinCancel": "Cancel"
+      "clientPinCancel": "Cancel",
+      "modePalm": "Palm",
+      "modeQr": "QR",
+      "recognitionTitle": "Palm recognition",
+      "recognitionInstructions": "Ask the client to present their palm to the camera.",
+      "recognitionLoading": "Preparing the scan…",
+      "recognitionError": "Recognition failed. Try again or use the client's QR code.",
+      "retry": "Try again",
+      "useQr": "Scan the client's QR code instead",
+      "usePalm": "Try palm recognition"
     },
     "receipt": {
       "successTitle": "Payment accepted",
@@ -216,6 +237,7 @@
     "exportTitle": "Export history",
     "exportEmpty": "No transactions to export.",
     "exportError": "Unable to generate the export.",
+    "exportSuccess": "Export generated successfully.",
     "exportUnavailable": "File sharing isn't available on this device.",
     "csv": {
       "date": "Date",
@@ -269,6 +291,7 @@
     "rccmLabel": "RCCM",
     "nccLabel": "NCC / TIN",
     "sectionAccount": "Account",
+    "sectionSecurity": "Security",
     "sectionHelp": "Help",
     "sectionLegal": "Legal",
     "kybMenu": "Account validation (KYB)",
@@ -279,7 +302,27 @@
     "privacyMenu": "Privacy policy",
     "logout": "Log out",
     "logoutConfirmTitle": "Log out",
-    "logoutConfirmText": "Are you sure you want to log out?"
+    "logoutConfirmText": "Are you sure you want to log out?",
+    "biometricLockTitle": "Phone biometrics",
+    "biometricLockSubtitle": "Face ID / fingerprint to open the app",
+    "biometricActivationCancelledText": "Authentication could not be verified.",
+    "biometricEnabledSuccess": "Biometric lock enabled.",
+    "biometricDisabledSuccess": "Biometric lock disabled.",
+    "logo": {
+      "title": "Business logo",
+      "takePhoto": "Take a photo",
+      "chooseGallery": "Choose from gallery",
+      "remove": "Remove logo",
+      "removeConfirmTitle": "Remove logo",
+      "removeConfirmText": "Are you sure you want to remove your profile logo?",
+      "permissionDeniedTitle": "Permission denied",
+      "permissionDeniedText": "AfriPay needs access to the camera or gallery to change the logo.",
+      "genericError": "Something went wrong",
+      "uploadError": "Couldn't upload the logo. Please try again.",
+      "removeError": "Couldn't remove the logo. Please try again.",
+      "uploadSuccess": "Logo updated.",
+      "removeSuccess": "Logo removed."
+    }
   },
   "support": {
     "title": "Get help",
@@ -310,7 +353,36 @@
     "mismatchError": "The PIN codes don't match. Try again.",
     "saveError": "Unable to update the PIN code.",
     "successText": "PIN code updated.",
-    "securityNote": "Never share this code. AfriPay will never ask for it by phone or SMS."
+    "securityNote": "Never share this code. AfriPay will never ask for it by phone or SMS.",
+    "forgotPin": "Forgot PIN code?"
+  },
+  "forgotAccess": {
+    "titlePin": "Forgot AfriPay PIN code",
+    "titlePassword": "Forgot password",
+    "subtitlePin": "A verification code will be sent to your merchant account's phone number.",
+    "subtitlePassword": "Enter your phone number to receive a verification code.",
+    "phoneLabel": "Phone number",
+    "phonePlaceholder": "e.g. 0700000000",
+    "sendCode": "Send code",
+    "missingPhone": "Please enter your phone number.",
+    "otpError": "Unable to send the code.",
+    "resetTitlePin": "New AfriPay PIN code",
+    "resetTitlePassword": "New password",
+    "resetSubtitle": "A code was sent to {{phone}}.",
+    "codeLabel": "Verification code",
+    "newPinLabel": "New PIN code",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "At least 6 characters",
+    "confirmLabel": "Confirm",
+    "submit": "Reset",
+    "missingCode": "Please enter the code you received by SMS.",
+    "pinInvalid": "The PIN code must be 4 to 6 digits.",
+    "passwordTooShort": "The password must be at least 6 characters long.",
+    "mismatch": "The two entries don't match.",
+    "successTitle": "Reset successful",
+    "successTextPin": "Your AfriPay PIN code has been updated.",
+    "successTextPassword": "Your password has been updated. Sign in again with your new password.",
+    "error": "Unable to reset. Check the code you received by SMS."
   },
   "kyb": {
     "home": {

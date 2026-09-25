@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import PinDots from '../../components/PinDots';
 import PinKeypad from '../../components/PinKeypad';
 import Icon from '../../components/Icon';
+import Card from '../../components/Card';
 import colors, { radii } from '../../theme/colors';
 import { setMerchantPin } from '../../api/auth';
 import { extractErrorMessage } from '../../api/client';
@@ -81,44 +82,55 @@ export default function ChangePinScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.iconWrap}>
-        <Icon name="key" size={24} color={colors.turquoise} />
-      </View>
-
-      <View style={styles.progressRow}>
-        {STAGES.map((s, i) => (
-          <View key={s} style={[styles.progressSegment, i <= stepIndex && styles.progressSegmentDone]} />
-        ))}
-      </View>
-      <Text style={styles.progressLabel}>{t('changePin.stepLabel', { current: stepIndex + 1, total: STAGES.length })}</Text>
-
-      <Text style={styles.title}>
-        {stage === 'current' ? t('changePin.titleCurrent') : stage === 'enter' ? t('changePin.titleNew') : t('changePin.titleConfirm')}
-      </Text>
-      <Text style={styles.subtitle}>
-        {stage === 'current'
-          ? t('changePin.subtitleCurrent')
-          : stage === 'enter'
-          ? t('changePin.subtitleCreate')
-          : t('changePin.subtitleConfirm')}
-      </Text>
-
-      {error ? (
-        <View style={styles.errorBanner}>
-          <Icon name="circle-exclamation" size={14} color={colors.error} />
-          <Text style={styles.errorText}>{error}</Text>
+      <Card style={styles.card}>
+        <View style={styles.iconWrap}>
+          <Icon name="key" size={24} color={colors.turquoise} />
         </View>
-      ) : null}
-      {success ? (
-        <View style={styles.successBanner}>
-          <Icon name="circle-check" size={14} color={colors.success} />
-          <Text style={styles.successText}>{t('changePin.successText')}</Text>
+
+        <View style={styles.progressRow}>
+          {STAGES.map((s, i) => (
+            <View key={s} style={[styles.progressSegment, i <= stepIndex && styles.progressSegmentDone]} />
+          ))}
         </View>
-      ) : null}
+        <Text style={styles.progressLabel}>{t('changePin.stepLabel', { current: stepIndex + 1, total: STAGES.length })}</Text>
 
-      <PinDots length={pin.length} minSlots={PIN_LENGTH} />
+        <Text style={styles.title}>
+          {stage === 'current' ? t('changePin.titleCurrent') : stage === 'enter' ? t('changePin.titleNew') : t('changePin.titleConfirm')}
+        </Text>
+        <Text style={styles.subtitle}>
+          {stage === 'current'
+            ? t('changePin.subtitleCurrent')
+            : stage === 'enter'
+            ? t('changePin.subtitleCreate')
+            : t('changePin.subtitleConfirm')}
+        </Text>
 
-      <PinKeypad onDigit={onDigit} onBackspace={onBackspace} disabled={loading || success} />
+        {error ? (
+          <View style={styles.errorBanner}>
+            <Icon name="circle-exclamation" size={14} color={colors.error} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+        {success ? (
+          <View style={styles.successBanner}>
+            <Icon name="circle-check" size={14} color={colors.success} />
+            <Text style={styles.successText}>{t('changePin.successText')}</Text>
+          </View>
+        ) : null}
+
+        <PinDots length={pin.length} minSlots={PIN_LENGTH} />
+
+        <PinKeypad onDigit={onDigit} onBackspace={onBackspace} disabled={loading || success} />
+      </Card>
+
+      {stage === 'current' && (
+        <Pressable
+          onPress={() => navigation.navigate('ForgotAccessPhone', { type: 'pin' })}
+          style={styles.forgotLink}
+        >
+          <Text style={styles.forgotLinkText}>{t('changePin.forgotPin')}</Text>
+        </Pressable>
+      )}
 
       <View style={styles.securityNote}>
         <Icon name="shield-halved" size={13} color={colors.textMuted} />
@@ -130,6 +142,7 @@ export default function ChangePinScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 24, paddingTop: 24 },
+  card: { alignItems: 'stretch', paddingVertical: 24 },
   iconWrap: {
     alignSelf: 'center',
     width: 52,
@@ -172,6 +185,15 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   successText: { flex: 1, color: colors.success, fontSize: 12.5, fontWeight: '600' },
+  forgotLink: {
+    alignSelf: 'center',
+    marginTop: 16,
+  },
+  forgotLinkText: {
+    color: colors.turquoise,
+    fontSize: 12.5,
+    fontWeight: '600',
+  },
   securityNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',

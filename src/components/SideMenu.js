@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, Pressable, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
+import { Modal, View, Text, Image, Pressable, StyleSheet, Animated, Dimensions, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from './Icon';
 import { KybBadge } from './StatusBadge';
+import Card from './Card';
 import colors, { radii } from '../theme/colors';
+import { resolveMediaUrl } from '../config/api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.8, 320);
@@ -78,9 +80,13 @@ export default function SideMenu({ visible, onClose, merchant, navigation, onLog
                 <Icon name="xmark" size={16} color={colors.textSecondary} />
               </Pressable>
 
-              <View style={styles.profileBlock}>
+              <Card style={styles.profileCard}>
                 <View style={styles.avatar}>
-                  <Icon name="store" size={26} color={colors.text} />
+                  {merchant?.logo_url ? (
+                    <Image source={{ uri: resolveMediaUrl(merchant.logo_url) }} style={styles.avatarImage} />
+                  ) : (
+                    <Icon name="store" size={26} color={colors.text} />
+                  )}
                 </View>
                 <Text style={styles.name} numberOfLines={1}>
                   {merchant?.raison_sociale || t('settings.defaultMerchantName')}
@@ -89,23 +95,27 @@ export default function SideMenu({ visible, onClose, merchant, navigation, onLog
                 <View style={{ marginTop: 8 }}>
                   <KybBadge statut={merchant?.statut_kyb} />
                 </View>
-              </View>
+              </Card>
 
-              <View style={styles.divider} />
-
-              {MENU_ITEMS.map((item) => (
-                <Pressable
-                  key={item.key}
-                  style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
-                  onPress={() => go(item)}
-                >
-                  <View style={styles.itemIcon}>
-                    <Icon name={item.icon} size={14} color={colors.turquoise} />
-                  </View>
-                  <Text style={styles.itemLabel}>{t(item.labelKey)}</Text>
-                  <Icon name="chevron-right" size={13} color={colors.textMuted} />
-                </Pressable>
-              ))}
+              <Card style={styles.menuCard}>
+                {MENU_ITEMS.map((item, i) => (
+                  <Pressable
+                    key={item.key}
+                    style={({ pressed }) => [
+                      styles.item,
+                      i < MENU_ITEMS.length - 1 && styles.itemDivider,
+                      pressed && styles.itemPressed,
+                    ]}
+                    onPress={() => go(item)}
+                  >
+                    <View style={styles.itemIcon}>
+                      <Icon name={item.icon} size={14} color={colors.turquoise} />
+                    </View>
+                    <Text style={styles.itemLabel}>{t(item.labelKey)}</Text>
+                    <Icon name="chevron-right" size={13} color={colors.textMuted} />
+                  </Pressable>
+                ))}
+              </Card>
 
               <Pressable
                 style={({ pressed }) => [styles.logoutBtn, pressed && styles.logoutBtnPressed]}
@@ -151,7 +161,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 8,
   },
-  profileBlock: { alignItems: 'center', paddingBottom: 16 },
+  profileCard: {
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    marginBottom: 16,
+  },
+  menuCard: {
+    backgroundColor: colors.background,
+    padding: 6,
+    marginBottom: 16,
+  },
   avatar: {
     width: 60,
     height: 60,
@@ -160,18 +179,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+    overflow: 'hidden',
   },
+  avatarImage: { width: 60, height: 60 },
   name: { color: colors.text, fontWeight: '700', fontSize: 15 },
   phone: { color: colors.textSecondary, fontSize: 12.5, marginTop: 2 },
-  divider: { height: 1, backgroundColor: colors.border, marginVertical: 8 },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     borderRadius: radii.md,
   },
-  itemPressed: { backgroundColor: colors.background },
+  itemDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  itemPressed: { backgroundColor: colors.card },
   itemIcon: {
     width: 30,
     height: 30,

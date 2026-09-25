@@ -8,6 +8,8 @@ import RegisterTypeScreen from '../screens/Auth/RegisterTypeScreen';
 import RegisterFormScreen from '../screens/Auth/RegisterFormScreen';
 import OtpScreen from '../screens/Auth/OtpScreen';
 import SetPinScreen from '../screens/Auth/SetPinScreen';
+import ForgotAccessPhoneScreen from '../screens/Auth/ForgotAccessPhoneScreen';
+import ForgotAccessResetScreen from '../screens/Auth/ForgotAccessResetScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +34,8 @@ export default function AuthNavigator() {
         component={SetPinScreen}
         options={{ title: t('headers.pinCode'), headerBackVisible: false }}
       />
+      <Stack.Screen name="ForgotAccessPhone" component={ForgotAccessPhoneScreen} options={{ title: '' }} />
+      <Stack.Screen name="ForgotAccessReset" component={ForgotAccessResetScreen} options={{ title: '' }} />
     </Stack.Navigator>
   );
 }

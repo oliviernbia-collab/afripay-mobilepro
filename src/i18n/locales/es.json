@@ -1,5 +1,15 @@
 {
+  "appLockGate": {
+    "title": "AfriPay bloqueado",
+    "subtitle": "Autentíquese para acceder a su cuenta.",
+    "unlock": "Desbloquear",
+    "authCancelled": "Autenticación cancelada o fallida.",
+    "authUnavailable": "No se pudo verificar su identidad en este dispositivo.",
+    "promptMessage": "Desbloquear AfriPay Pro",
+    "promptCancelLabel": "Cancelar"
+  },
   "common": {
+    "ok": "OK",
     "cancel": "Cancelar",
     "save": "Guardar",
     "send": "Enviar",
@@ -95,6 +105,7 @@
     "kybBannerText": "Cuenta pendiente de validación — podrá cobrar en cuanto su expediente sea aprobado. Toque para completar su expediente KYB.",
     "balanceLabel": "Saldo disponible",
     "balanceSub": "Billetera AfriPay Comercio",
+    "offlineBalance": "Sin conexión — saldo del {{time}}",
     "today": "Hoy",
     "todayEncaissements": "Cobros",
     "todayTransferts": "Transferencias",
@@ -116,7 +127,8 @@
       "noAccount": "¿Aún no tiene una cuenta de comercio?",
       "createAccount": "Crear una cuenta",
       "missingFields": "Ingrese su teléfono y su contraseña.",
-      "error": "No se pudo iniciar sesión. Verifique sus credenciales."
+      "error": "No se pudo iniciar sesión. Verifique sus credenciales.",
+      "forgotPassword": "¿Olvidó su contraseña?"
     },
     "otp": {
       "title": "Verificación del número",
@@ -193,7 +205,16 @@
       "paymentFailed": "El pago falló.",
       "clientPinTitle": "PIN del cliente requerido",
       "clientPinSubtitle": "Este monto requiere confirmación. Pida al cliente que ingrese su código PIN AfriPay.",
-      "clientPinCancel": "Cancelar"
+      "clientPinCancel": "Cancelar",
+      "modePalm": "Palma",
+      "modeQr": "QR",
+      "recognitionTitle": "Reconocimiento palmar",
+      "recognitionInstructions": "Pida al cliente que presente su palma frente a la cámara.",
+      "recognitionLoading": "Preparando el escaneo…",
+      "recognitionError": "El reconocimiento falló. Reinténtelo o use el código QR del cliente.",
+      "retry": "Reintentar",
+      "useQr": "Escanear el código QR del cliente en su lugar",
+      "usePalm": "Probar el reconocimiento palmar"
     },
     "receipt": {
       "successTitle": "Pago aceptado",
@@ -216,6 +237,7 @@
     "exportTitle": "Exportar historial",
     "exportEmpty": "No hay transacciones para exportar.",
     "exportError": "No se pudo generar la exportación.",
+    "exportSuccess": "Exportación generada con éxito.",
     "exportUnavailable": "Compartir archivos no está disponible en este dispositivo.",
     "csv": {
       "date": "Fecha",
@@ -269,6 +291,7 @@
     "rccmLabel": "RCCM",
     "nccLabel": "NCC / NIF",
     "sectionAccount": "Cuenta",
+    "sectionSecurity": "Seguridad",
     "sectionHelp": "Ayuda",
     "sectionLegal": "Legal",
     "kybMenu": "Validación de la cuenta (KYB)",
@@ -279,7 +302,27 @@
     "privacyMenu": "Política de privacidad",
     "logout": "Cerrar sesión",
     "logoutConfirmTitle": "Cerrar sesión",
-    "logoutConfirmText": "¿Seguro que desea cerrar sesión?"
+    "logoutConfirmText": "¿Seguro que desea cerrar sesión?",
+    "biometricLockTitle": "Biometría del teléfono",
+    "biometricLockSubtitle": "Face ID / huella para abrir la app",
+    "biometricActivationCancelledText": "No se pudo verificar la autenticación.",
+    "biometricEnabledSuccess": "Bloqueo biométrico activado.",
+    "biometricDisabledSuccess": "Bloqueo biométrico desactivado.",
+    "logo": {
+      "title": "Logo del negocio",
+      "takePhoto": "Tomar una foto",
+      "chooseGallery": "Elegir de la galería",
+      "remove": "Quitar el logo",
+      "removeConfirmTitle": "Quitar el logo",
+      "removeConfirmText": "¿Seguro que desea quitar el logo de su perfil?",
+      "permissionDeniedTitle": "Permiso denegado",
+      "permissionDeniedText": "AfriPay necesita acceso a la cámara o a la galería para cambiar el logo.",
+      "genericError": "Ocurrió un error",
+      "uploadError": "No se pudo enviar el logo. Inténtelo de nuevo.",
+      "removeError": "No se pudo quitar el logo. Inténtelo de nuevo.",
+      "uploadSuccess": "Logo actualizado.",
+      "removeSuccess": "Logo eliminado."
+    }
   },
   "support": {
     "title": "Obtener ayuda",
@@ -310,7 +353,36 @@
     "mismatchError": "Los códigos PIN no coinciden. Vuelva a intentarlo.",
     "saveError": "No se pudo actualizar el código PIN.",
     "successText": "Código PIN actualizado.",
-    "securityNote": "Nunca comparta este código. AfriPay nunca se lo pedirá por teléfono o SMS."
+    "securityNote": "Nunca comparta este código. AfriPay nunca se lo pedirá por teléfono o SMS.",
+    "forgotPin": "¿Olvidó su código PIN?"
+  },
+  "forgotAccess": {
+    "titlePin": "Código PIN AfriPay olvidado",
+    "titlePassword": "Contraseña olvidada",
+    "subtitlePin": "Se enviará un código de verificación al número de su cuenta de comercio.",
+    "subtitlePassword": "Ingrese su número de teléfono para recibir un código de verificación.",
+    "phoneLabel": "Número de teléfono",
+    "phonePlaceholder": "Ej: 0700000000",
+    "sendCode": "Enviar código",
+    "missingPhone": "Ingrese su número de teléfono.",
+    "otpError": "No se pudo enviar el código.",
+    "resetTitlePin": "Nuevo código PIN AfriPay",
+    "resetTitlePassword": "Nueva contraseña",
+    "resetSubtitle": "Se envió un código al {{phone}}.",
+    "codeLabel": "Código de verificación",
+    "newPinLabel": "Nuevo código PIN",
+    "newPasswordLabel": "Nueva contraseña",
+    "newPasswordPlaceholder": "Al menos 6 caracteres",
+    "confirmLabel": "Confirmar",
+    "submit": "Restablecer",
+    "missingCode": "Ingrese el código recibido por SMS.",
+    "pinInvalid": "El código PIN debe tener entre 4 y 6 dígitos.",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "mismatch": "Las dos entradas no coinciden.",
+    "successTitle": "Restablecimiento exitoso",
+    "successTextPin": "Su código PIN AfriPay ha sido actualizado.",
+    "successTextPassword": "Su contraseña ha sido actualizada. Vuelva a iniciar sesión con su nueva contraseña.",
+    "error": "No se pudo restablecer. Verifique el código recibido por SMS."
   },
   "kyb": {
     "home": {
