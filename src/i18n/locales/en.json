@@ -209,10 +209,10 @@
       "modePalm": "Palm",
       "modeQr": "QR",
       "recognitionTitle": "Palm recognition",
-      "recognitionInstructions": "Ask the client to present their palm to the camera.",
-      "recognitionLoading": "Preparing the scan…",
+      "recognitionInstructions": "Ask the client to present their palm, then take a photo of it.",
+      "capturePalm": "Photograph the palm",
+      "cameraPermissionDenied": "Allow camera access to photograph the client's palm.",
       "recognitionError": "Recognition failed. Try again or use the client's QR code.",
-      "retry": "Try again",
       "useQr": "Scan the client's QR code instead",
       "usePalm": "Try palm recognition"
     },
@@ -334,7 +334,7 @@
       },
       {
         "q": "How does the payment scan work?",
-        "a": "The customer shows a QR code on their AfriPay app (\"Pay\" screen). You scan this code with the camera to collect the amount — it replaces real palm recognition in this version."
+        "a": "By default, photograph the client's palm directly with the camera: the app identifies the client automatically. If recognition fails (lighting, angle...), use the QR code shown on the client's \"Pay\" screen instead."
       },
       {
         "q": "Is the PIN code mandatory?",

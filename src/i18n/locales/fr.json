@@ -209,10 +209,10 @@
       "modePalm": "Paume",
       "modeQr": "QR",
       "recognitionTitle": "Reconnaissance palmaire",
-      "recognitionInstructions": "Demandez au client de présenter sa paume devant la caméra.",
-      "recognitionLoading": "Préparation du scan…",
+      "recognitionInstructions": "Demandez au client de présenter sa paume, puis photographiez-la.",
+      "capturePalm": "Photographier la paume",
+      "cameraPermissionDenied": "Autorisez l'accès à la caméra pour photographier la paume du client.",
       "recognitionError": "La reconnaissance a échoué. Réessayez ou utilisez le QR du client.",
-      "retry": "Réessayer",
       "useQr": "Scanner le QR du client à la place",
       "usePalm": "Essayer la reconnaissance palmaire"
     },
@@ -334,7 +334,7 @@
       },
       {
         "q": "Comment fonctionne le scan de paiement ?",
-        "a": "Le client affiche un QR code sur son application AfriPay (écran « Payer »). Vous scannez ce code avec la caméra pour encaisser le montant — il remplace la reconnaissance de paume de main réelle dans cette version."
+        "a": "Par défaut, photographiez directement la paume du client avec la caméra : l'application identifie automatiquement le client. Si la reconnaissance échoue (éclairage, angle...), utilisez le QR code affiché par le client sur son écran « Payer »."
       },
       {
         "q": "Le code PIN est-il obligatoire ?",

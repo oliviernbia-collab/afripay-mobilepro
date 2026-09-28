@@ -209,10 +209,10 @@
       "modePalm": "Palma",
       "modeQr": "QR",
       "recognitionTitle": "Reconocimiento palmar",
-      "recognitionInstructions": "Pida al cliente que presente su palma frente a la cámara.",
-      "recognitionLoading": "Preparando el escaneo…",
+      "recognitionInstructions": "Pida al cliente que presente su palma y fotografíela.",
+      "capturePalm": "Fotografiar la palma",
+      "cameraPermissionDenied": "Autorice el acceso a la cámara para fotografiar la palma del cliente.",
       "recognitionError": "El reconocimiento falló. Reinténtelo o use el código QR del cliente.",
-      "retry": "Reintentar",
       "useQr": "Escanear el código QR del cliente en su lugar",
       "usePalm": "Probar el reconocimiento palmar"
     },
@@ -334,7 +334,7 @@
       },
       {
         "q": "¿Cómo funciona el escaneo de pago?",
-        "a": "El cliente muestra un código QR en su aplicación AfriPay (pantalla «Pagar»). Usted escanea este código con la cámara para cobrar el monto — reemplaza el reconocimiento real de la palma en esta versión."
+        "a": "Por defecto, fotografíe directamente la palma del cliente con la cámara: la aplicación identifica al cliente automáticamente. Si el reconocimiento falla (iluminación, ángulo...), use el código QR mostrado en la pantalla «Pagar» del cliente."
       },
       {
         "q": "¿Es obligatorio el código PIN?",
