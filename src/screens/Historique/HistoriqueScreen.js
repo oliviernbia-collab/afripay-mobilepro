@@ -21,7 +21,7 @@ function csvCell(value) {
 }
 
 export default function HistoriqueScreen({ navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { showWarning, showError, showSuccess } = useToast();
   const [walletId, setWalletId] = useState(null);
   const [period, setPeriod] = useState('jour');
@@ -169,6 +169,10 @@ export default function HistoriqueScreen({ navigation }) {
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id}
+        // Sans extraData, FlatList mémorise ses lignes et ne les redessine pas juste parce que la
+        // langue a changé — txDisplayTitle dépend de `t`, donc les titres restaient figés en cas
+        // de changement de langue sans navigation hors de cet écran.
+        extraData={i18n.language}
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.magenta} />}
         ListHeaderComponent={

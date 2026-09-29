@@ -17,7 +17,7 @@ const TYPE_ICONS = {
 };
 
 export default function NotificationsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -90,6 +90,10 @@ export default function NotificationsScreen() {
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
+        // Sans extraData, FlatList mémorise ses lignes et ne les redessine pas juste parce que la
+        // langue a changé — notificationText() dépend de `t`, donc le titre/contenu restaient
+        // figés en cas de changement de langue sans navigation hors de cet écran.
+        extraData={i18n.language}
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.magenta} />}
         ListEmptyComponent={
