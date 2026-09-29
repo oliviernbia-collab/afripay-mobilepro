@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } fr
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
-import colors, { radii } from '../../theme/colors';
+import colors, { radii, notificationText } from '../../theme/colors';
 import Card from '../../components/Card';
 import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../../api/notifications';
 import { formatDateTime } from '../../utils/format';
@@ -99,23 +99,26 @@ export default function NotificationsScreen() {
             </Card>
           ) : null
         }
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)} activeOpacity={0.8}>
-            <Card style={[styles.notifCard, !item.lu && styles.notifCardUnread]}>
-              <View style={styles.notifRow}>
-                <View style={styles.notifIcon}>
-                  <Icon name={TYPE_ICONS[item.type] || 'bell'} size={20} color={colors.turquoise} />
+        renderItem={({ item }) => {
+          const { titre, contenu } = notificationText(item, t);
+          return (
+            <TouchableOpacity onPress={() => handlePress(item)} activeOpacity={0.8}>
+              <Card style={[styles.notifCard, !item.lu && styles.notifCardUnread]}>
+                <View style={styles.notifRow}>
+                  <View style={styles.notifIcon}>
+                    <Icon name={TYPE_ICONS[item.type] || 'bell'} size={20} color={colors.turquoise} />
+                  </View>
+                  <View style={styles.notifText}>
+                    <Text style={styles.notifTitle}>{titre}</Text>
+                    <Text style={styles.notifBody}>{contenu}</Text>
+                    <Text style={styles.notifDate}>{formatDateTime(item.date_creation)}</Text>
+                  </View>
+                  {!item.lu ? <View style={styles.unreadDot} /> : null}
                 </View>
-                <View style={styles.notifText}>
-                  <Text style={styles.notifTitle}>{item.titre}</Text>
-                  <Text style={styles.notifBody}>{item.contenu}</Text>
-                  <Text style={styles.notifDate}>{formatDateTime(item.date_creation)}</Text>
-                </View>
-                {!item.lu ? <View style={styles.unreadDot} /> : null}
-              </View>
-            </Card>
-          </TouchableOpacity>
-        )}
+              </Card>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );

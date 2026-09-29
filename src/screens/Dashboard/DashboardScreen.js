@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { LinearGradient } from 'expo-linear-gradient';
-import colors, { gradients, radii } from '../../theme/colors';
+import colors, { gradients, radii, txDisplayTitle } from '../../theme/colors';
 import Card from '../../components/Card';
 import BrandHeader from '../../components/BrandHeader';
 import { KybBadge, TransactionStatusBadge } from '../../components/StatusBadge';
@@ -216,7 +216,7 @@ export default function DashboardScreen({ navigation }) {
               <TxTypeIcon type={tx.type} />
               <View style={[styles.txLeft, { marginLeft: 12 }]}>
                 <Text style={styles.txLibelle} numberOfLines={1}>
-                  {tx.libelle || tx.type}
+                  {txDisplayTitle(tx, tx.wallet_destination_id === wallet?.id, t)}
                 </Text>
                 <Text style={styles.txDate}>{formatDateTime(tx.date_heure)}</Text>
               </View>

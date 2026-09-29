@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from '../components/Icon';
 import colors from '../theme/colors';
@@ -24,6 +25,7 @@ const ICONS = {
 // only the visible tabBarLabel is translated here.
 export default function MainTabNavigator() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -34,8 +36,12 @@ export default function MainTabNavigator() {
         tabBarStyle: {
           backgroundColor: colors.backgroundAlt,
           borderTopColor: colors.border,
-          height: 62,
-          paddingBottom: 8,
+          // Hauteur/marge basse fixes (62/8) ignoraient la zone de sécurité du téléphone (barre de
+          // navigation Android à 3 boutons, geste iPhone...) — sur les appareils avec une barre
+          // système visible, nos propres icônes se retrouvaient collées/mélangées à celle-ci.
+          // useSafeAreaInsets() donne l'espace réel à réserver en plus, par appareil.
+          height: 62 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 6,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },

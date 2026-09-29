@@ -144,8 +144,11 @@ function ExternalTransferForm() {
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         {success ? (
+          // Le retrait est confirmé de façon asynchrone par MoneyFusion (webhook) — le wallet est
+          // débité tout de suite (voir transferService.externalTransfer), mais "réussi" n'est vrai
+          // qu'une fois la confirmation reçue, pas à cet instant.
           <Text style={styles.successText}>
-            {t('transfer.successExternal', { operator: t(`providers.${operateur}`, { defaultValue: operateur }) })}
+            {t('transfer.pendingExternal', { operator: t(`providers.${operateur}`, { defaultValue: operateur }) })}
           </Text>
         ) : null}
 

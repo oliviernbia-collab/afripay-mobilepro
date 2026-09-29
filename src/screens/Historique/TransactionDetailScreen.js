@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
-import colors from '../../theme/colors';
+import colors, { txTypeLabel, txMethodLabel, statutLabel as statutLabelFn, providerLabel } from '../../theme/colors';
 import Card from '../../components/Card';
 import { TransactionStatusBadge } from '../../components/StatusBadge';
 import { formatFcfa, formatDateTime } from '../../utils/format';
@@ -11,19 +11,7 @@ export default function TransactionDetailScreen({ route }) {
   const { t } = useTranslation();
   const { transaction, walletId } = route.params;
   const isCredit = transaction.wallet_destination_id === walletId;
-
-  const TYPE_LABELS = {
-    achat: t('txType.achat'),
-    transfert: t('txType.transfert'),
-    recharge: t('txType.recharge'),
-  };
-  const METHOD_LABELS = {
-    paume_de_main: t('txMethod.paume_de_main'),
-    mobile_money: t('txMethod.mobile_money'),
-    carte_visa: t('txMethod.carte_visa'),
-    interne: t('txMethod.interne'),
-  };
-  const statutLabel = t(`status.tx.${transaction.statut}`, { defaultValue: transaction.statut });
+  const statutLabel = statutLabelFn(transaction.statut, t);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -41,15 +29,21 @@ export default function TransactionDetailScreen({ route }) {
       <TransactionStatusBadge statut={transaction.statut} style={{ marginTop: 8 }} />
 
       <Card style={styles.card}>
-        <Row label={t('historiqueDetail.typeLabel')} value={TYPE_LABELS[transaction.type] || transaction.type} />
-        <Row
-          label={t('historiqueDetail.methodLabel')}
-          value={METHOD_LABELS[transaction['méthode']] || transaction['méthode'] || '—'}
-        />
+        <Row label={t('historiqueDetail.typeLabel')} value={txTypeLabel(transaction.type, t)} />
+        <Row label={t('historiqueDetail.methodLabel')} value={txMethodLabel(transaction['méthode'], t)} />
         {transaction.contrepartie?.telephone ? (
           <Row label={t('historiqueDetail.numberLabel')} value={transaction.contrepartie.telephone} />
         ) : null}
-        <Row label={t('historiqueDetail.libelleLabel')} value={transaction.libelle || '—'} />
+        {transaction.contrepartie?.fournisseur ? (
+          <Row label={t('historiqueDetail.providerLabel')} value={providerLabel(transaction.contrepartie.fournisseur, t)} />
+        ) : null}
+        {/* Le libellé d'un virement interne est un texte libre saisi par l'expéditeur (affiché tel
+            quel, ce n'est pas un rendu serveur traduit) ; pour achat/recharge/virement externe,
+            `libelle` est un texte déjà traduit et figé — l'info équivalente est déjà reconstruite
+            ci-dessus (contrepartie/fournisseur), donc pas de repli sur ce texte frozen ici. */}
+        {transaction.type === 'transfert' && !transaction.contrepartie?.externe ? (
+          <Row label={t('historiqueDetail.libelleLabel')} value={transaction.libelle || '—'} />
+        ) : null}
         <Row label={t('historiqueDetail.referenceLabel')} value={transaction.reference} />
         <Row label={t('historiqueDetail.dateLabel')} value={formatDateTime(transaction.date_heure)} />
         {Number(transaction.frais) > 0 ? <Row label={t('historiqueDetail.feesLabel')} value={formatFcfa(transaction.frais)} /> : null}

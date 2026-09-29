@@ -259,12 +259,19 @@
     "filterTransferts": "Transferts",
     "filterRecharges": "Recharges",
     "empty": "Aucune transaction trouvée.",
-    "loadError": "Impossible de charger l'historique."
+    "loadError": "Impossible de charger l'historique.",
+    "receivedFrom": "Reçu de {{name}}",
+    "sentTo": "Envoyé à {{name}}",
+    "transferReceived": "Transfert reçu",
+    "transferSent": "Transfert envoyé",
+    "paymentFrom": "Encaissement de {{name}}",
+    "rechargeVia": "Recharge via {{provider}}"
   },
   "historiqueDetail": {
     "typeLabel": "Type",
     "methodLabel": "Méthode",
     "numberLabel": "Numéro",
+    "providerLabel": "Fournisseur",
     "libelleLabel": "Libellé",
     "referenceLabel": "Référence",
     "dateLabel": "Date & heure",
@@ -277,6 +284,17 @@
     "empty": "Aucune notification pour le moment.",
     "loadError": "Impossible de charger les notifications.",
     "markAllError": "Impossible de marquer tout comme lu."
+  },
+  "notif": {
+    "transferReceived": { "title": "Transfert reçu", "body": "Vous avez reçu {{montant}} FCFA sur votre compte AfriPay." },
+    "paymentReceivedMerchant": { "title": "Encaissement reçu", "body": "Encaissement de {{montant}} FCFA validé." },
+    "kybUpdate": {
+      "title": "Mise à jour de votre dossier KYB",
+      "validated": "Votre dossier a été validé. L'encaissement par paume de main est activé.",
+      "other": "Votre dossier a été {{decision}}. {{motif}}"
+    },
+    "payoutConfirmed": { "title": "Retrait confirmé", "body": "Votre retrait de {{montant}} FCFA a été confirmé." },
+    "payoutFailed": { "title": "Retrait échoué", "body": "Votre retrait de {{montant}} FCFA a échoué. Le montant a été recrédité sur votre portefeuille." }
   },
   "sideMenu": {
     "allSettings": "Tous les paramètres"
@@ -432,6 +450,7 @@
     "missingFieldsInternal": "Renseignez le numéro du destinataire et le montant.",
     "pinRequired": "Votre code PIN AfriPay (4 à 6 chiffres) est requis.",
     "successExternal": "Transfert envoyé avec succès vers {{operator}}.",
+    "pendingExternal": "Retrait vers {{operator}} en cours de traitement. Le montant a été débité ; vous serez notifié dès la confirmation.",
     "successInternal": "Transfert AfriPay effectué avec succès.",
     "genericError": "Le transfert a échoué."
   },

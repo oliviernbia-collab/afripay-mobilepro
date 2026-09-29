@@ -259,12 +259,19 @@
     "filterTransferts": "Transfers",
     "filterRecharges": "Top-ups",
     "empty": "No transactions found.",
-    "loadError": "Unable to load your history."
+    "loadError": "Unable to load your history.",
+    "receivedFrom": "Received from {{name}}",
+    "sentTo": "Sent to {{name}}",
+    "transferReceived": "Transfer received",
+    "transferSent": "Transfer sent",
+    "paymentFrom": "Payment from {{name}}",
+    "rechargeVia": "Top-up via {{provider}}"
   },
   "historiqueDetail": {
     "typeLabel": "Type",
     "methodLabel": "Method",
     "numberLabel": "Number",
+    "providerLabel": "Provider",
     "libelleLabel": "Label",
     "referenceLabel": "Reference",
     "dateLabel": "Date & time",
@@ -277,6 +284,17 @@
     "empty": "No notifications yet.",
     "loadError": "Unable to load notifications.",
     "markAllError": "Unable to mark everything as read."
+  },
+  "notif": {
+    "transferReceived": { "title": "Transfer received", "body": "You received {{montant}} FCFA on your AfriPay account." },
+    "paymentReceivedMerchant": { "title": "Payment received", "body": "Payment of {{montant}} FCFA confirmed." },
+    "kybUpdate": {
+      "title": "Your KYB file has been updated",
+      "validated": "Your file has been approved. Palm payment collection is now active.",
+      "other": "Your file has been {{decision}}. {{motif}}"
+    },
+    "payoutConfirmed": { "title": "Withdrawal confirmed", "body": "Your withdrawal of {{montant}} FCFA has been confirmed." },
+    "payoutFailed": { "title": "Withdrawal failed", "body": "Your withdrawal of {{montant}} FCFA failed. The amount has been credited back to your wallet." }
   },
   "sideMenu": {
     "allSettings": "All settings"
@@ -432,6 +450,7 @@
     "missingFieldsInternal": "Enter the recipient's number and amount.",
     "pinRequired": "Your AfriPay PIN (4 to 6 digits) is required.",
     "successExternal": "Transfer successfully sent to {{operator}}.",
+    "pendingExternal": "Withdrawal to {{operator}} is being processed. The amount has been debited; you'll be notified once confirmed.",
     "successInternal": "AfriPay transfer completed successfully.",
     "genericError": "The transfer failed."
   },

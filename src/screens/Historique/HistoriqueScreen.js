@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import Icon from '../../components/Icon';
-import colors, { radii } from '../../theme/colors';
+import colors, { radii, txDisplayTitle } from '../../theme/colors';
 import Card from '../../components/Card';
 import TxTypeIcon from '../../components/TxTypeIcon';
 import { TransactionStatusBadge } from '../../components/StatusBadge';
@@ -106,7 +106,7 @@ export default function HistoriqueScreen({ navigation }) {
         t(`txMethod.${tx['méthode']}`, { defaultValue: tx['méthode'] || '' }),
         tx.contrepartie?.telephone || '',
         tx.reference,
-        tx.libelle || '',
+        txDisplayTitle(tx, tx.wallet_destination_id === walletId, t),
       ]);
       const csvContent = [header, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n');
       // Excel needs a UTF-8 BOM to render accented characters correctly.
@@ -200,7 +200,7 @@ export default function HistoriqueScreen({ navigation }) {
                 <TxTypeIcon type={item.type} />
                 <View style={[styles.txLeft, { marginLeft: 12 }]}>
                   <Text style={styles.txLibelle} numberOfLines={1}>
-                    {item.libelle || item.type}
+                    {txDisplayTitle(item, item.wallet_destination_id === walletId, t)}
                   </Text>
                   <Text style={styles.txDate}>{formatDateTime(item.date_heure)}</Text>
                 </View>
