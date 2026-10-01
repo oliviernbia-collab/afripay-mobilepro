@@ -163,11 +163,9 @@ const styles = StyleSheet.create({
   },
   profileCard: {
     alignItems: 'center',
-    backgroundColor: colors.background,
     marginBottom: 16,
   },
   menuCard: {
-    backgroundColor: colors.background,
     padding: 6,
     marginBottom: 16,
   },

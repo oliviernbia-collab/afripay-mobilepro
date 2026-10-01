@@ -281,7 +281,12 @@
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Mark all read",
+    "periodAll": "All time",
+    "periodToday": "Today",
+    "periodWeek": "This week",
+    "periodMonth": "This month",
     "empty": "No notifications yet.",
+    "emptyFiltered": "No notifications for this period.",
     "loadError": "Unable to load notifications.",
     "markAllError": "Unable to mark everything as read."
   },

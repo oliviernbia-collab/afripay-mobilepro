@@ -281,7 +281,12 @@
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Tout marquer lu",
+    "periodAll": "Toute période",
+    "periodToday": "Aujourd'hui",
+    "periodWeek": "Cette semaine",
+    "periodMonth": "Ce mois",
     "empty": "Aucune notification pour le moment.",
+    "emptyFiltered": "Aucune notification sur cette période.",
     "loadError": "Impossible de charger les notifications.",
     "markAllError": "Impossible de marquer tout comme lu."
   },
