@@ -12,7 +12,7 @@
 //  - iOS simulator: the simulator shares the host's network stack, so
 //    "http://localhost:4000/api" works.
 
-const DEVICE_LAN_IP = '192.168.1.150';
+const DEVICE_LAN_IP = '192.168.1.30';
 
 const HOSTS = {
   device: `http://${DEVICE_LAN_IP}:4000/api`,

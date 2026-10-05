@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,9 @@ import Input from '../../components/Input';
 import GradientButton from '../../components/GradientButton';
 import IconRow from '../../components/IconRow';
 import Card from '../../components/Card';
-import { transferInterne, transferExterne, MOBILE_MONEY_OPERATORS } from '../../api/transferts';
+import { transferInterne, transferExterne, getFraisRetrait, MOBILE_MONEY_OPERATORS } from '../../api/transferts';
 import { extractErrorMessage } from '../../api/client';
+import { formatFcfa } from '../../utils/format';
 
 const OPERATOR_META = {
   wave: { color: '#1DC8E3', icon: 'droplet' },
@@ -64,8 +65,23 @@ function ExternalTransferForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
+  const [tauxFrais, setTauxFrais] = useState(null);
+
+  useEffect(() => {
+    // Silencieux si indisponible : l'aperçu ne s'affiche alors simplement pas, le retrait lui-même
+    // n'en dépend pas (le frais réel, lui, est toujours calculé côté backend).
+    getFraisRetrait()
+      .then((data) => setTauxFrais(Number(data?.taux)))
+      .catch(() => {});
+  }, []);
 
   const montantValue = Number(montant || 0);
+  // Aperçu avant confirmation : le wallet marchand est débité du plein montant (voir backend
+  // transferService.externalTransfer), mais seul montant - frais part réellement vers le Mobile
+  // Money du marchand.
+  const previewActif = Number.isFinite(tauxFrais) && montantValue > 0;
+  const fraisPreview = previewActif ? Math.round(montantValue * tauxFrais) : 0;
+  const recuPreview = previewActif ? montantValue - fraisPreview : 0;
 
   const handleSubmit = async () => {
     setError('');
@@ -133,6 +149,24 @@ function ExternalTransferForm() {
           value={montant}
           onChangeText={(v) => setMontant(v.replace(/[^0-9]/g, ''))}
         />
+
+        {previewActif ? (
+          <View style={styles.feePreviewCard}>
+            <View style={styles.feePreviewRow}>
+              <Text style={styles.feePreviewLabel}>
+                {t('transfer.feePreviewFees', { taux: `${Math.round(tauxFrais * 1000) / 10}%` })}
+              </Text>
+              <Text style={styles.feePreviewValue}>-{formatFcfa(fraisPreview)}</Text>
+            </View>
+            <View style={styles.feePreviewRow}>
+              <Text style={styles.feePreviewLabelStrong}>
+                {t('transfer.feePreviewReceived', { operator: t(`providers.${operateur}`, { defaultValue: operateur }) })}
+              </Text>
+              <Text style={styles.feePreviewValueStrong}>{formatFcfa(recuPreview)}</Text>
+            </View>
+          </View>
+        ) : null}
+
         <Input
           label={t('transfer.pinLabel')}
           placeholder="••••"
@@ -144,7 +178,7 @@ function ExternalTransferForm() {
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         {success ? (
-          // Le retrait est confirmé de façon asynchrone par MoneyFusion (webhook) — le wallet est
+          // Le retrait est confirmé de façon asynchrone par Jèko (webhook) — le wallet est
           // débité tout de suite (voir transferService.externalTransfer), mais "réussi" n'est vrai
           // qu'une fois la confirmation reçue, pas à cet instant.
           <Text style={styles.successText}>
@@ -270,4 +304,18 @@ const styles = StyleSheet.create({
   label: { color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '500' },
   errorText: { color: colors.error, fontSize: 13, marginBottom: 12, textAlign: 'center' },
   successText: { color: colors.success, fontSize: 13, marginBottom: 12, textAlign: 'center', fontWeight: '600' },
+  feePreviewCard: {
+    backgroundColor: colors.background,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 12,
+    gap: 6,
+    marginBottom: 12,
+  },
+  feePreviewRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  feePreviewLabel: { color: colors.textSecondary, fontSize: 13 },
+  feePreviewValue: { color: colors.textSecondary, fontSize: 13 },
+  feePreviewLabelStrong: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  feePreviewValueStrong: { color: colors.text, fontSize: 14, fontWeight: '700' },
 });

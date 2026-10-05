@@ -26,3 +26,10 @@ export async function transferExterne({ operateurDestination, numeroDestinataire
   });
   return data.data; // { transaction, wallet }
 }
+
+// Taux de frais AfriPay sur le retrait (voir backend/src/services/transferService.js) — pour
+// afficher un aperçu ("vous recevrez X") avant confirmation, sans dupliquer la valeur en dur ici.
+export async function getFraisRetrait() {
+  const { data } = await api.get('/transferts/frais-retrait');
+  return data.data; // { taux }
+}

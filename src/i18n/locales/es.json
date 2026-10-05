@@ -348,7 +348,12 @@
     }
   },
   "support": {
-    "title": "Obtener ayuda",
+    "greeting": "Hola 👋",
+    "title": "¿Cómo podemos ayudarle?",
+    "sendMessageLabel": "Envíenos un mensaje",
+    "searchPlaceholder": "Buscar una respuesta",
+    "noResultsTitle": "Sin resultados",
+    "noResultsText": "Pruebe con otra palabra clave, o envíenos un mensaje directamente.",
     "faqSectionLabel": "Preguntas frecuentes",
     "faq": [
       {
@@ -447,6 +452,8 @@
     "internalNumberLabel": "Teléfono del destinatario",
     "numberPlaceholder": "Ej: 0700000000",
     "amountLabel": "Monto (FCFA)",
+    "feePreviewFees": "Comisión AfriPay ({{taux}})",
+    "feePreviewReceived": "Usted recibirá en {{operator}}",
     "pinLabel": "Código PIN AfriPay",
     "noteLabel": "Nota (opcional)",
     "notePlaceholder": "Motivo de la transferencia",
