@@ -6,6 +6,7 @@ import './src/i18n';
 import { LanguageProvider } from './src/context/LanguageContext';
 import { AuthProvider } from './src/context/AuthContext';
 import { ToastProvider } from './src/context/ToastContext';
+import { NotificationsProvider } from './src/context/NotificationsContext';
 import RootNavigator from './src/navigation/RootNavigator';
 import colors from './src/theme/colors';
 import { initOfflineReadQueue } from './src/utils/offlineReadQueue';
@@ -33,12 +34,14 @@ export default function App() {
     <SafeAreaProvider>
       <LanguageProvider>
         <AuthProvider>
-          <NavigationContainer theme={navigationTheme}>
-            <ToastProvider>
-              <StatusBar style="light" />
-              <RootNavigator />
-            </ToastProvider>
-          </NavigationContainer>
+          <NotificationsProvider>
+            <NavigationContainer theme={navigationTheme}>
+              <ToastProvider>
+                <StatusBar style="light" />
+                <RootNavigator />
+              </ToastProvider>
+            </NavigationContainer>
+          </NotificationsProvider>
         </AuthProvider>
       </LanguageProvider>
     </SafeAreaProvider>

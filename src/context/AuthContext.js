@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { getAccessToken, saveTokens, clearTokens, setOnAuthFailure } from '../api/client';
 import { getMe, loginMerchant as apiLoginMerchant, registerMerchant as apiRegisterMerchant } from '../api/auth';
+import { connectRealtime, disconnectRealtime } from '../realtime/socket';
 
 const AuthContext = createContext(null);
 
@@ -58,6 +59,14 @@ export function AuthProvider({ children }) {
     setMerchant(result.merchant);
     return result.merchant;
   }, []);
+
+  // Connexion temps réel (voir realtime/socket.js) dérivée d'un seul endroit de l'état `merchant`
+  // plutôt que dispatchée à chaque site qui fait setMerchant(...) (login/register/restauration au
+  // démarrage/déconnexion forcée) : un seul effet ne peut pas en oublier un.
+  useEffect(() => {
+    if (merchant) connectRealtime();
+    else disconnectRealtime();
+  }, [merchant]);
 
   const value = {
     merchant,

@@ -19,11 +19,14 @@ import { transferInterne, transferExterne, getFraisRetrait, MOBILE_MONEY_OPERATO
 import { extractErrorMessage } from '../../api/client';
 import { formatFcfa } from '../../utils/format';
 
+// `icon`/`color` restent le repli FontAwesome (utilisé si `logo` est absent) ; `logo` est le vrai
+// logo de marque (icône d'app officielle récupérée depuis le Play Store de chaque fournisseur —
+// voir assets/providers/) affiché à la place dans IconRow.
 const OPERATOR_META = {
-  wave: { color: '#1DC8E3', icon: 'droplet' },
-  orange_money: { color: colors.orange, icon: 'mobile-screen' },
-  moov_money: { color: colors.blue, icon: 'tower-cell' },
-  mtn_money: { color: colors.gold, icon: 'sim-card' },
+  wave: { color: '#1DC8E3', icon: 'droplet', logo: require('../../../assets/providers/wave.png') },
+  orange_money: { color: colors.orange, icon: 'mobile-screen', logo: require('../../../assets/providers/orange_money.png') },
+  moov_money: { color: colors.blue, icon: 'tower-cell', logo: require('../../../assets/providers/moov_money.png') },
+  mtn_money: { color: colors.gold, icon: 'sim-card', logo: require('../../../assets/providers/mtn_money.png') },
 };
 
 export default function TransferScreen() {
@@ -126,6 +129,7 @@ function ExternalTransferForm() {
               key={op.value}
               icon={meta.icon}
               iconColor={meta.color}
+              image={meta.logo}
               label={t(`providers.${op.value}`, { defaultValue: op.label })}
               selected={operateur === op.value}
               onPress={() => setOperateur(op.value)}

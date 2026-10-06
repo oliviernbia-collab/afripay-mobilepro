@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,8 @@ import { formatFcfa, formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
 import { getCached, setCached } from '../../utils/offlineCache';
 import TxTypeIcon from '../../components/TxTypeIcon';
+import { socket } from '../../realtime/socket';
+import { useNotificationsBadge } from '../../context/NotificationsContext';
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const WALLET_CACHE_KEY = 'wallet';
@@ -23,6 +25,7 @@ const WALLET_CACHE_KEY = 'wallet';
 export default function DashboardScreen({ navigation }) {
   const { t } = useTranslation();
   const { merchant, isKybValidated, refreshMerchant, logout } = useAuth();
+  const { hasUnread } = useNotificationsBadge();
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [todayEncaisse, setTodayEncaisse] = useState(0);
@@ -86,6 +89,14 @@ export default function DashboardScreen({ navigation }) {
     }, [loadData])
   );
 
+  // Temps réel (voir backend/src/realtime/socket.js) : dès qu'un webhook Jèko confirme un retrait,
+  // ou qu'un encaissement/virement arrive, le solde affiché se met à jour sans attendre que le
+  // marchand quitte puis revienne sur cet écran ou tire pour rafraîchir.
+  useEffect(() => {
+    socket.on('wallet:updated', loadData);
+    return () => socket.off('wallet:updated', loadData);
+  }, [loadData]);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await loadData();
@@ -125,6 +136,7 @@ export default function DashboardScreen({ navigation }) {
         <LanguageSwitcher />
         <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.bellBtn}>
           <Icon name="bell" size={18} color={colors.turquoise} />
+          {hasUnread ? <View style={styles.bellDot} /> : null}
         </TouchableOpacity>
       </View>
 
@@ -277,6 +289,17 @@ const styles = StyleSheet.create({
     borderColor: colors.turquoise,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bellDot: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: colors.magenta,
+    borderWidth: 1.5,
+    borderColor: colors.background,
   },
   avatar: {
     width: 44,

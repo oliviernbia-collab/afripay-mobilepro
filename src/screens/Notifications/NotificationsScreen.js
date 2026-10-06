@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,8 @@ import { getNotifications, markNotificationRead, markAllNotificationsRead } from
 import { formatDateTime } from '../../utils/format';
 import { extractErrorMessage } from '../../api/client';
 import { enqueueMarkRead } from '../../utils/offlineReadQueue';
+import { socket } from '../../realtime/socket';
+import { useNotificationsBadge } from '../../context/NotificationsContext';
 
 const TYPE_ICONS = {
   transaction: 'money-bill-transfer',
@@ -38,6 +40,7 @@ function periodRange(key) {
 
 export default function NotificationsScreen() {
   const { t, i18n } = useTranslation();
+  const { markSeen } = useNotificationsBadge();
   const [items, setItems] = useState([]);
   const [period, setPeriod] = useState(undefined);
   const [loading, setLoading] = useState(true);
@@ -65,8 +68,21 @@ export default function NotificationsScreen() {
     useCallback(() => {
       setLoading(true);
       load().finally(() => setLoading(false));
-    }, [load])
+      markSeen();
+    }, [load, markSeen])
   );
+
+  // Temps réel (voir backend/src/services/notificationService.js) : une notification qui arrive
+  // pendant que cet écran est déjà ouvert apparaît directement en tête de liste, sans attendre un
+  // refocus ou un tirer-pour-rafraîchir.
+  useEffect(() => {
+    const onNew = (notif) => {
+      setItems((prev) => [notif, ...prev]);
+      markSeen();
+    };
+    socket.on('notification:new', onNew);
+    return () => socket.off('notification:new', onNew);
+  }, [markSeen]);
 
   const onRefresh = async () => {
     setRefreshing(true);
