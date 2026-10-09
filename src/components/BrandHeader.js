@@ -9,7 +9,7 @@ const LOGO_COMPACT = require('../../assets/brand/logo-compact.png');
 
 // size: 'splash' | 'main' | 'compact' | 'icon'
 // showTagline: show "Payez. Envoyez. Progressez." under the logo
-export default function BrandHeader({ size = 'main', showTagline = false, style }) {
+export default function BrandHeader({ size = 'main', showTagline = false, scale = 1, style }) {
   const { t } = useTranslation();
   const source = size === 'splash' ? LOGO_SPLASH : size === 'compact' || size === 'icon' ? LOGO_COMPACT : LOGO_MAIN;
   const imgStyle =
@@ -17,7 +17,11 @@ export default function BrandHeader({ size = 'main', showTagline = false, style 
 
   return (
     <View style={[styles.container, style]}>
-      <Image source={source} style={imgStyle} resizeMode="contain" />
+      <Image
+        source={source}
+        style={[imgStyle, scale !== 1 && { width: imgStyle.width * scale, height: imgStyle.height * scale }]}
+        resizeMode="contain"
+      />
       {showTagline ? <Text style={styles.tagline}>{t('brand.tagline')}</Text> : null}
     </View>
   );

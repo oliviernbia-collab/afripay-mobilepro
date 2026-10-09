@@ -13,11 +13,11 @@ export default function OtpScreen({ route, navigation }) {
   const { devCode, registerPayload } = route.params;
   const { register } = useAuth();
 
-  const [otp, setOtp] = useState(devCode || '');
+  const [otp, setOtp] = useState(__DEV__ ? devCode || '' : '');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
-  const [currentDevCode, setCurrentDevCode] = useState(devCode);
+  const [currentDevCode, setCurrentDevCode] = useState(__DEV__ ? devCode : undefined);
 
   const handleVerify = async () => {
     setError('');
@@ -41,8 +41,10 @@ export default function OtpScreen({ route, navigation }) {
     setResending(true);
     try {
       const result = await requestMerchantOtp(registerPayload.telephone);
-      setCurrentDevCode(result.devCode);
-      if (result.devCode) setOtp(result.devCode);
+      if (__DEV__) {
+        setCurrentDevCode(result.devCode);
+        if (result.devCode) setOtp(result.devCode);
+      }
     } catch (e) {
       setError(extractErrorMessage(e, t('auth.otp.resendError')));
     } finally {

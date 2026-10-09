@@ -25,7 +25,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "permissions": [
-        "CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -33,6 +34,14 @@
     },
     "plugins": [
       "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
       [
         "expo-camera",
         {
@@ -48,6 +57,12 @@
       "expo-font",
       "expo-localization",
       "expo-sharing"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b1ef5d37-cc40-40e5-8e14-f0d4e806b956"
+      }
+    },
+    "owner": "kamenan"
   }
 }

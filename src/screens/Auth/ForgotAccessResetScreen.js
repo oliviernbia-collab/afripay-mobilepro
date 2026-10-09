@@ -66,7 +66,7 @@ export default function ForgotAccessResetScreen({ navigation, route }) {
           <Text style={styles.title}>{isPin ? t('forgotAccess.resetTitlePin') : t('forgotAccess.resetTitlePassword')}</Text>
           <Text style={styles.subtitle}>{t('forgotAccess.resetSubtitle', { phone: telephone })}</Text>
 
-          {devCode ? (
+          {__DEV__ && devCode ? (
             <View style={styles.devHint}>
               <Text style={styles.devHintTitle}>{t('auth.otp.devTitle')}</Text>
               <Text style={styles.devHintText}>{t('auth.otp.devText', { code: devCode })}</Text>

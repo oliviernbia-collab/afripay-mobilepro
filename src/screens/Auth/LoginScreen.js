@@ -53,7 +53,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <View style={styles.header}>
-          <BrandHeader size="main" showTagline />
+          <BrandHeader size="main" showTagline scale={0.82} />
         </View>
 
         <Card style={styles.card}>
@@ -116,8 +116,8 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: 4,
-    marginBottom: 16,
+    marginTop: -8,
+    marginBottom: 12,
   },
   card: {
     paddingVertical: 20,
