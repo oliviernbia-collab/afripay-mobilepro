@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import BrandHeader from '../../components/BrandHeader';
 import Input from '../../components/Input';
@@ -20,6 +21,9 @@ import { extractErrorMessage } from '../../api/client';
 
 export default function LoginScreen({ navigation }) {
   const { t } = useTranslation();
+  // Cet écran n'est pas dans un SafeAreaView : sans ça le sélecteur de langue remonte
+  // sous la barre d'état (heure / réseau / batterie) de l'appareil.
+  const insets = useSafeAreaInsets();
   const { login } = useAuth();
   const [telephone, setTelephone] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
@@ -47,13 +51,16 @@ export default function LoginScreen({ navigation }) {
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 16 }]}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.langRow}>
           <LanguageSwitcher />
         </View>
 
         <View style={styles.header}>
-          <BrandHeader size="main" showTagline scale={0.82} />
+          <BrandHeader size="main" showTagline scale={0.7} circle />
         </View>
 
         <Card style={styles.card}>
@@ -107,17 +114,18 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: colors.background,
     paddingHorizontal: 24,
-    paddingTop: 16,
+    // paddingTop est appliqué dynamiquement (insets.top + 16) dans le composant.
     paddingBottom: 40,
   },
   langRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    marginTop: 8,
   },
   header: {
     alignItems: 'center',
-    marginTop: -8,
-    marginBottom: 12,
+    marginTop: 8,
+    marginBottom: 16,
   },
   card: {
     paddingVertical: 20,

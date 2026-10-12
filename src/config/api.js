@@ -18,7 +18,7 @@
 // retrouver, même en chaîne de caractères inerte, dans un binaire distribué.
 let DEV_API_BASE_URL;
 if (__DEV__) {
-  const DEVICE_LAN_IP = '192.168.1.30';
+  const DEVICE_LAN_IP = '192.168.1.82';
   const HOSTS = {
     device: `http://${DEVICE_LAN_IP}:4000/api`,
     androidEmulator: 'http://10.0.2.2:4000/api',
